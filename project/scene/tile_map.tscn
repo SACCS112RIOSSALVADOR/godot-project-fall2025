@@ -1,8 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://6eihbd7qiowo"]
+[gd_scene load_steps=6 format=3 uid="uid://d3lffvikgcyk2"]
 
-[ext_resource type="Texture2D" uid="uid://c5w7vb4a67vgk" path="res://assets/tetrominoes.png" id="1_70qy1"]
-[ext_resource type="Script" uid="uid://c7sgluytw43l6" path="res://TileMap.gd" id="2_akelh"]
-[ext_resource type="PackedScene" uid="uid://dq0xmkuctiirq" path="res://scene/hud.tscn" id="3_akelh"]
+[ext_resource type="Texture2D" uid="uid://clfplbf78ys8p" path="res://project/assets/tetrominoes.png" id="1_70qy1"]
+[ext_resource type="Script" uid="uid://c7sgluytw43l6" path="res://project/scripts/TileMap.gd" id="2_akelh"]
+[ext_resource type="PackedScene" uid="uid://dq0xmkuctiirq" path="res://project/scene/hud.tscn" id="3_akelh"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_p70hw"]
 texture = ExtResource("1_70qy1")

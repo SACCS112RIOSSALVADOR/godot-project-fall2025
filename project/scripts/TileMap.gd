@@ -131,7 +131,7 @@ func new_game():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame
 # Handles input and movement updates
-func _process(delta):
+func _process(_delta):
 	if game_running:
 		# Check for player input and accumulate steps
 		if Input.is_action_pressed("ui_left"):
