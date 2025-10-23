@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="capstone_project"
-run/main_scene="uid://xyubiujw3nyd"
+run/main_scene="uid://crk7beciiao70"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 

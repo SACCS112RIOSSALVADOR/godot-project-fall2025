@@ -1,0 +1,137 @@
+[gd_scene load_steps=9 format=3 uid="uid://crk7beciiao70"]
+
+[ext_resource type="Script" uid="uid://dywwgthqkryk3" path="res://project/scene/main_menu.gd" id="1_hm1n3"]
+[ext_resource type="Texture2D" uid="uid://b4ajls65ce7xv" path="res://project/assets/background.png" id="1_pq50a"]
+[ext_resource type="FontFile" uid="uid://cw2mrc7ocgxm1" path="res://project/assets/font/super_sliced/Super Sliced.ttf" id="2_jiovq"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jiovq"]
+texture = ExtResource("1_pq50a")
+modulate_color = Color(0.585062, 0.585062, 0.5850621, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xx3bj"]
+bg_color = Color(0.68979377, 0.52508724, 1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pq50a"]
+bg_color = Color(0.452268, 0.002704563, 0.83031696, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jiovq"]
+bg_color = Color(0.57812196, 0.23189715, 0.99998266, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_size = 5
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pq50a"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hm1n3")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_jiovq")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 61.0
+offset_bottom = 198.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("2_jiovq")
+theme_override_font_sizes/font_size = 100
+text = "Tetris RPG"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -128.0
+offset_top = -264.0
+offset_right = 128.0
+offset_bottom = -73.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 10
+
+[node name="Start" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("2_jiovq")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_xx3bj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pq50a")
+theme_override_styles/hover = SubResource("StyleBoxFlat_jiovq")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_pq50a")
+text = "Start"
+
+[node name="Settings" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("2_jiovq")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_xx3bj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pq50a")
+theme_override_styles/hover = SubResource("StyleBoxFlat_jiovq")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_pq50a")
+text = "Settings"
+
+[node name="Exit" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("2_jiovq")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_xx3bj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pq50a")
+theme_override_styles/hover = SubResource("StyleBoxFlat_jiovq")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_pq50a")
+text = "Exit"
+
+[connection signal="pressed" from="VBoxContainer/Start" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="VBoxContainer/Settings" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="VBoxContainer/Exit" to="." method="_on_exit_pressed"]
