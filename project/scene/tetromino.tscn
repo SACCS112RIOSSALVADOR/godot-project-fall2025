@@ -1,9 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://7e6h4sdym42b"]
+[gd_scene load_steps=9 format=3 uid="uid://7e6h4sdym42b"]
 
 [ext_resource type="Texture2D" uid="uid://cmyxisrkggodh" path="res://project/assets/I-TetrominoB.png" id="1_50kky"]
 [ext_resource type="Script" uid="uid://4siuo2i16dah" path="res://project/scripts/tetromino.gd" id="1_s0n8s"]
 [ext_resource type="Texture2D" uid="uid://b4506yea0r10n" path="res://project/assets/T-TertrominoB.png" id="2_itnri"]
 [ext_resource type="Texture2D" uid="uid://basvd5sqgbhcj" path="res://project/assets/O-TertrominoB.png" id="4_rgba7"]
+[ext_resource type="Texture2D" uid="uid://c3lg3iwykohi2" path="res://project/assets/S-TertrominoB.png" id="5_ev68y"]
+[ext_resource type="Texture2D" uid="uid://b5ew0m6rk4qi3" path="res://project/assets/Z-TertromioB.png" id="6_arkor"]
+[ext_resource type="Texture2D" uid="uid://bwbjciov7mvq6" path="res://project/assets/L-TertrominoB.png" id="7_a6jdi"]
+[ext_resource type="Texture2D" uid="uid://cnc66qebd07co" path="res://project/assets/J-TertrominoB.png" id="8_s0yy3"]
 
 [node name="tetromino" type="Node2D"]
 script = ExtResource("1_s0n8s")
@@ -56,18 +60,65 @@ visible = false
 position = Vector2(-16, 0)
 polygon = PackedVector2Array(0, -16, 32, -16, 32, 16, 0, 16)
 
-[node name="S_collision" type="CollisionPolygon2D" parent="."]
-visible = false
+[node name="S_tetromino" type="Node2D" parent="."]
+
+[node name="S_shape" type="Sprite2D" parent="S_tetromino"]
+texture_filter = 1
+position = Vector2(24, 8)
+texture = ExtResource("5_ev68y")
+offset = Vector2(0, -8)
+
+[node name="S_body" type="CharacterBody2D" parent="S_tetromino/S_shape"]
+input_pickable = true
+
+[node name="S_collision" type="CollisionPolygon2D" parent="S_tetromino/S_shape/S_body"]
+position = Vector2(-24, -8)
 polygon = PackedVector2Array(0, 0, 16, 0, 16, -16, 32, -16, 48, -16, 48, 0, 32, 0, 32, 16, 16, 16, 0, 16)
 
-[node name="Z_collision" type="CollisionPolygon2D" parent="."]
+[node name="Z_tetromino" type="Node2D" parent="."]
+
+[node name="Z_shape" type="Sprite2D" parent="Z_tetromino"]
+texture_filter = 1
+position = Vector2(24, 8)
+texture = ExtResource("6_arkor")
+offset = Vector2(0, -8)
+
+[node name="Z_body" type="CharacterBody2D" parent="Z_tetromino/Z_shape"]
+input_pickable = true
+
+[node name="Z_collision" type="CollisionPolygon2D" parent="Z_tetromino/Z_shape/Z_body"]
 visible = false
+position = Vector2(-24, -8)
 polygon = PackedVector2Array(0, -16, 16, -16, 32, -16, 32, 0, 48, 0, 48, 16, 32, 16, 16, 16, 16, 0, 0, 0)
 
-[node name="L_collision" type="CollisionPolygon2D" parent="."]
+[node name="L_tetromino" type="Node2D" parent="."]
+
+[node name="L_body" type="Sprite2D" parent="L_tetromino"]
+texture_filter = 1
+position = Vector2(24, -8)
+texture = ExtResource("7_a6jdi")
+offset = Vector2(0, 8)
+
+[node name="L_shape" type="CharacterBody2D" parent="L_tetromino/L_body"]
+input_pickable = true
+
+[node name="L_collision" type="CollisionPolygon2D" parent="L_tetromino/L_body/L_shape"]
 visible = false
+position = Vector2(-24, 8)
 polygon = PackedVector2Array(0, -16, 48, -16, 48, 0, 16, 0, 16, 16, 0, 16, 0, 0)
 
-[node name="J_collision" type="CollisionPolygon2D" parent="."]
+[node name="J_tetromino" type="Node2D" parent="."]
+
+[node name="J_shape" type="Sprite2D" parent="J_tetromino"]
+texture_filter = 1
+position = Vector2(24, -8)
+texture = ExtResource("8_s0yy3")
+offset = Vector2(0, 8)
+
+[node name="J_body" type="CharacterBody2D" parent="J_tetromino/J_shape"]
+input_pickable = true
+
+[node name="J_collision" type="CollisionPolygon2D" parent="J_tetromino/J_shape/J_body"]
 visible = false
+position = Vector2(-24, 8)
 polygon = PackedVector2Array(0, -16, 48, -16, 48, 0, 48, 16, 32, 16, 32, 0, 0, 0)

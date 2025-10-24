@@ -1,12 +1,10 @@
 extends Node2D
 
-
 # Game variables
 var score : int
 const REWARD : int = 100
 var game_running : bool 
 var team : bool 
-var active_piece : Array  # Array of Vector2i positions for the current piece
 var pieces_remaining : int = 7
 
 

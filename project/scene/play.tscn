@@ -31,6 +31,7 @@ tile_set = SubResource("TileSet_sp4nc")
 [node name="Node2D" type="Node2D" parent="."]
 
 [node name="tetromino" parent="Node2D" instance=ExtResource("3_sp4nc")]
+position = Vector2(112, 256)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(144, 144)

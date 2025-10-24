@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AIAssistantResource" load_steps=5 format=3 uid="uid://d2uycimjiq6nd"]
+
+[ext_resource type="Resource" uid="uid://c0xq2vafep0gu" path="res://addons/ai_assistant_hub/llm_providers/ollama.tres" id="1_wmu8k"]
+[ext_resource type="Script" uid="uid://udm68efe6yxu" path="res://addons/ai_assistant_hub/quick_prompts/ai_quick_prompt_resource.gd" id="2_d7b6o"]
+[ext_resource type="Script" uid="uid://bmml4ey4cbb6m" path="res://addons/ai_assistant_hub/assistants/ai_assistant_resource.gd" id="3_cor7a"]
+
+[sub_resource type="Resource" id="Resource_wmu8k"]
+script = ExtResource("2_d7b6o")
+action_prompt = "Review this code:
+***gdscript
+{CODE}
+***"
+response_target = 1
+format_response_as_comment = true
+metadata/_custom_type_script = "uid://udm68efe6yxu"
+
+[resource]
+script = ExtResource("3_cor7a")
+type_name = "Coder"
+ai_model = "deepseek-coder-v2:latest"
+llm_provider = ExtResource("1_wmu8k")
+quick_prompts = Array[ExtResource("2_d7b6o")]([SubResource("Resource_wmu8k")])
