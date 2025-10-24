@@ -28,9 +28,6 @@ func newgame():
 func clear_board():
 	pass
 	
-#func check_game_over():
-	#for i in active_piece:
-		#if not is_free(i + cur_pos):
-			#land_piece()	
-			#$HUD.get_node("GameOverLabel").show()
-			#game_running = false
+func check_game_over():
+	if pieces_remaining == 0:
+		game_running = false
