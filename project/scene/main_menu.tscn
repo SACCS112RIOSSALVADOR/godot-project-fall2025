@@ -1,8 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://crk7beciiao70"]
+[gd_scene load_steps=15 format=3 uid="uid://crk7beciiao70"]
 
 [ext_resource type="Script" uid="uid://dywwgthqkryk3" path="res://project/scene/main_menu.gd" id="1_hm1n3"]
 [ext_resource type="Texture2D" uid="uid://b4ajls65ce7xv" path="res://project/assets/background.png" id="1_pq50a"]
 [ext_resource type="FontFile" uid="uid://cw2mrc7ocgxm1" path="res://project/assets/font/super_sliced/Super Sliced.ttf" id="2_jiovq"]
+[ext_resource type="AudioStream" uid="uid://4drx6b3oq5ft" path="res://project/assets/music/puzzle_groove_arcade.mp3" id="4_lqv66"]
+[ext_resource type="Script" uid="uid://cpk05hwusjx8b" path="res://project/scene/volume_control.gd" id="5_jd013"]
+[ext_resource type="Script" uid="uid://cgwpixiwy8h0h" path="res://project/scene/fullscreen_control.gd" id="6_1uctu"]
+[ext_resource type="Script" uid="uid://cse3w73jrbkq" path="res://project/scene/resolution_scaling.gd" id="7_dmuvt"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jiovq"]
 texture = ExtResource("1_pq50a")
@@ -34,6 +38,14 @@ shadow_size = 5
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pq50a"]
 
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_lqv66"]
+color = Color(0.6901961, 0.5254902, 1, 1)
+thickness = 7
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_jd013"]
+color = Color(0.19236407, 0.42222854, 1, 1)
+thickness = 7
+
 [node name="MainMenu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -56,8 +68,8 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_jiovq")
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 61.0
-offset_bottom = 198.0
+offset_top = 65.0
+offset_bottom = 202.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
@@ -69,22 +81,23 @@ text = "Tetris RPG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="main_menu_buttons" type="VBoxContainer" parent="."]
+visible = false
 layout_mode = 1
-anchors_preset = 7
+anchors_preset = -1
 anchor_left = 0.5
-anchor_top = 1.0
+anchor_top = 0.64000005
 anchor_right = 0.5
-anchor_bottom = 1.0
+anchor_bottom = 0.64000005
 offset_left = -128.0
-offset_top = -264.0
+offset_top = -95.72003
 offset_right = 128.0
-offset_bottom = -73.0
+offset_bottom = 95.27997
 grow_horizontal = 2
-grow_vertical = 0
+grow_vertical = 2
 theme_override_constants/separation = 10
 
-[node name="Start" type="Button" parent="VBoxContainer"]
+[node name="Start" type="Button" parent="main_menu_buttons"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
@@ -100,7 +113,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_jiovq")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_pq50a")
 text = "Start"
 
-[node name="Settings" type="Button" parent="VBoxContainer"]
+[node name="Settings" type="Button" parent="main_menu_buttons"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
@@ -116,7 +129,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_jiovq")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_pq50a")
 text = "Settings"
 
-[node name="Exit" type="Button" parent="VBoxContainer"]
+[node name="Exit" type="Button" parent="main_menu_buttons"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
@@ -132,6 +145,151 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_jiovq")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_pq50a")
 text = "Exit"
 
-[connection signal="pressed" from="VBoxContainer/Start" to="." method="_on_start_pressed"]
-[connection signal="pressed" from="VBoxContainer/Settings" to="." method="_on_settings_pressed"]
-[connection signal="pressed" from="VBoxContainer/Exit" to="." method="_on_exit_pressed"]
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_lqv66")
+autoplay = true
+bus = &"Music"
+
+[node name="settings_panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -288.5
+offset_top = -88.0
+offset_right = 288.5
+offset_bottom = 276.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Volume" type="Label" parent="settings_panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.007751938
+anchor_right = 1.0
+anchor_bottom = 0.007751938
+offset_bottom = 50.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("2_jiovq")
+theme_override_font_sizes/font_size = 40
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Back" type="Button" parent="settings_panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 4.1400003
+anchor_right = 0.5
+anchor_bottom = 4.1400003
+offset_left = -76.5
+offset_top = -1219.9601
+offset_right = 76.5
+offset_bottom = -1151.9601
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("2_jiovq")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_xx3bj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pq50a")
+theme_override_styles/hover = SubResource("StyleBoxFlat_jiovq")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_pq50a")
+text = "Back"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="settings_panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -194.0
+offset_top = -96.0
+offset_right = 184.0
+offset_bottom = 96.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+
+[node name="HBoxContainer1" type="HBoxContainer" parent="settings_panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 38
+
+[node name="Label" type="Label" parent="settings_panel/VBoxContainer/HBoxContainer1"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_jiovq")
+text = "Volume"
+
+[node name="volume_control" type="HSlider" parent="settings_panel/VBoxContainer/HBoxContainer1"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_styles/slider = SubResource("StyleBoxLine_lqv66")
+theme_override_styles/grabber_area = SubResource("StyleBoxLine_jd013")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxLine_jd013")
+max_value = 1.0
+step = 0.05
+value = 1.0
+script = ExtResource("5_jd013")
+audio_bus_name = "Music"
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="settings_panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 200
+
+[node name="Label" type="Label" parent="settings_panel/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_jiovq")
+text = "Fullscreen Toggle"
+
+[node name="fullscreen_control" type="CheckButton" parent="settings_panel/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_jiovq")
+theme_override_font_sizes/font_size = 20
+script = ExtResource("6_1uctu")
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="settings_panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 160
+
+[node name="Label" type="Label" parent="settings_panel/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_jiovq")
+text = "Resolution Scaling"
+
+[node name="ResolutionScaling" type="OptionButton" parent="settings_panel/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "100%"
+popup/item_0/id = 0
+popup/item_1/text = "75%"
+popup/item_1/id = 1
+popup/item_2/text = "50%"
+popup/item_2/id = 2
+popup/item_3/text = "25%"
+popup/item_3/id = 3
+script = ExtResource("7_dmuvt")
+
+[connection signal="pressed" from="main_menu_buttons/Start" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="main_menu_buttons/Settings" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="main_menu_buttons/Exit" to="." method="_on_exit_pressed"]
+[connection signal="pressed" from="settings_panel/Back" to="." method="_on_back_pressed"]
+[connection signal="value_changed" from="settings_panel/VBoxContainer/HBoxContainer1/volume_control" to="settings_panel/VBoxContainer/HBoxContainer1/volume_control" method="_on_value_changed"]
+[connection signal="toggled" from="settings_panel/VBoxContainer/HBoxContainer2/fullscreen_control" to="settings_panel/VBoxContainer/HBoxContainer2/fullscreen_control" method="_on_toggled_fullscreen"]
+[connection signal="item_selected" from="settings_panel/VBoxContainer/HBoxContainer3/ResolutionScaling" to="settings_panel/VBoxContainer/HBoxContainer3/ResolutionScaling" method="_on_item_selected"]
