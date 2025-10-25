@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://0ajk0kctpong" path="res://project/assets/small_tetrominos.png" id="1_oscul"]
 [ext_resource type="Script" uid="uid://cugoym7ghi2sg" path="res://project/scripts/play.gd" id="1_sp4nc"]
-[ext_resource type="PackedScene" uid="uid://7e6h4sdym42b" path="res://project/scene/tetromino.tscn" id="3_sp4nc"]
+[ext_resource type="PackedScene" uid="uid://dwa3fxru4oo3h" path="res://project/scene/i_tetromino.tscn" id="3_sp4nc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_67hsh"]
 texture = ExtResource("1_oscul")
@@ -30,8 +30,8 @@ tile_set = SubResource("TileSet_sp4nc")
 
 [node name="Node2D" type="Node2D" parent="."]
 
-[node name="tetromino" parent="Node2D" instance=ExtResource("3_sp4nc")]
-position = Vector2(112, 256)
+[node name="I_tetromino" parent="Node2D" instance=ExtResource("3_sp4nc")]
+position = Vector2(16, 16)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(144, 144)
