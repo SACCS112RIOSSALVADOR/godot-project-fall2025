@@ -27,18 +27,18 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 			is_selected = not is_selected
 			
 			if is_selected:
-				print("Object clicked on! State is now TRUE.")
+				print("T Teromino clicked on! State is now TRUE.")
 			else:
-				print("Object clicked off! State is now FALSE.")
+				print("T Teromino clicked off! State is now FALSE.")
 				
 				
-#detects if their is a collission on the right
-func right_collission()-> bool:
-	for rays in raycast_compass["right"]:
+#detects if their is a collission with raycats
+func check_collission(input)-> bool:
+	for rays in raycast_compass[input]:
 		if rays.is_colliding():
-			print("true")
+			print("path blocked")
 			return true
-	print("false")
+	print("path open")
 	return false
 
 #main function for movement
@@ -46,23 +46,23 @@ func _physics_process(delta: float) -> void:
 	input_dir = Vector2.ZERO
 	if is_selected:
 		if !sprite_node_pos_tween or !sprite_node_pos_tween.is_running():
-			if Input.is_action_pressed("ui_right") and right_collission() == false:
+			if Input.is_action_pressed("ui_right") and check_collission("right") == false:
 				_move(Vector2(1,0))
 			#finish the bottom funciton if possibible
-			elif Input.is_action_just_pressed("ui_left"):
-				pass
-			elif Input.is_action_just_pressed("ui_up"):
-				pass
-			elif Input.is_action_just_pressed("ui_down"):
-				pass
+			elif Input.is_action_just_pressed("ui_left") and check_collission("left") == false:
+				_move(Vector2(-1,0))
+			elif Input.is_action_just_pressed("ui_up") and check_collission("up") == false:
+				_move(Vector2(0,-1))
+			elif Input.is_action_just_pressed("ui_down") and check_collission("down") == false:
+				_move(Vector2(0,1))
 
 #tweening function for movement
 func _move(dir:Vector2):
 	global_position += dir * tile_size
-	$I_shape.global_position -=dir * tile_size
+	$T_shape.global_position -=dir * tile_size
 	
 	if sprite_node_pos_tween:
 		sprite_node_pos_tween.kill()
 	sprite_node_pos_tween = create_tween()
 	sprite_node_pos_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
-	sprite_node_pos_tween.tween_property($I_shape,"global_position", global_position, 0.185).set_trans(Tween.TRANS_SINE)
+	sprite_node_pos_tween.tween_property($T_shape,"global_position", global_position, 0.185).set_trans(Tween.TRANS_SINE)

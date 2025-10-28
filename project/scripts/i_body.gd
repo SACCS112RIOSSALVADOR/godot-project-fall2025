@@ -9,7 +9,7 @@ var is_selected = false
 var input_dir
 
 #swap vaules from their keys when rotation happens
-@onready var raycast_compass = {"down":[$RayCastA, $RayCastB, $RayCastC, $RayCastD],"right":[$RayCastE],"left":[$RayCastF],"up":[$RayCastG, $RayCastH, $RayCastI, $RayCastJ]}
+@onready var raycast_compass = {"down":[$RayCastA, $RayCastB, $RayCastC, $RayCastD],"right":[$RayCastE],"left":[$RayCastF],"up":[ $RayCastG, $RayCastH, $RayCastI, $RayCastJ]}
 var default_compass = raycast_compass 
 
 #note rotation should happen global_rotation
@@ -32,9 +32,9 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 				print("Object clicked off! State is now FALSE.")
 				
 				
-#detects if their is a collission on the right
-func right_collission()-> bool:
-	for rays in raycast_compass["right"]:
+#detects if their is a collission with raycasts
+func check_collission(input)-> bool:
+	for rays in raycast_compass[input]:
 		if rays.is_colliding():
 			print("true")
 			return true
@@ -46,15 +46,15 @@ func _physics_process(delta: float) -> void:
 	input_dir = Vector2.ZERO
 	if is_selected:
 		if !sprite_node_pos_tween or !sprite_node_pos_tween.is_running():
-			if Input.is_action_pressed("ui_right") and right_collission() == false:
+			if Input.is_action_pressed("ui_right") and check_collission("right") == false:
 				_move(Vector2(1,0))
 			#finish the bottom funciton if possibible
-			elif Input.is_action_just_pressed("ui_left"):
-				pass
-			elif Input.is_action_just_pressed("ui_up"):
-				pass
-			elif Input.is_action_just_pressed("ui_down"):
-				pass
+			elif Input.is_action_just_pressed("ui_left") and check_collission("left") == false:
+				_move(Vector2(-1,0))
+			elif Input.is_action_just_pressed("ui_up") and check_collission("up") == false:
+				_move(Vector2(0,-1))
+			elif Input.is_action_just_pressed("ui_down") and check_collission("down") == false:
+				_move(Vector2(0,1))
 
 #tweening function for movement
 func _move(dir:Vector2):

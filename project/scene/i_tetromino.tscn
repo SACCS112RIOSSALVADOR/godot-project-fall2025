@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dwa3fxru4oo3h"]
 
-[ext_resource type="Script" uid="uid://btwy5lta05020" path="res://project/scripts/o_body.gd" id="1_n8n50"]
+[ext_resource type="Script" uid="uid://sseoah1h801h" path="res://project/scripts/i_body.gd" id="1_n8n50"]
 [ext_resource type="Texture2D" uid="uid://cmyxisrkggodh" path="res://project/assets/I-TetrominoB.png" id="2_7sijx"]
 
 [node name="I_tetromino" type="Node2D"]
@@ -30,25 +30,21 @@ polygon = PackedVector2Array(-32, 8, 32, 8, 32, -8, -32, -8)
 position = Vector2(24, -8)
 target_position = Vector2(0, 16)
 hit_from_inside = true
-collide_with_bodies = false
 
 [node name="RayCastB" type="RayCast2D" parent="I_body"]
 position = Vector2(8, -8)
 target_position = Vector2(0, 16)
 hit_from_inside = true
-collide_with_bodies = false
 
 [node name="RayCastC" type="RayCast2D" parent="I_body"]
 position = Vector2(-8, -8)
 target_position = Vector2(0, 16)
 hit_from_inside = true
-collide_with_bodies = false
 
 [node name="RayCastD" type="RayCast2D" parent="I_body"]
 position = Vector2(-24, -8)
 target_position = Vector2(0, 16)
 hit_from_inside = true
-collide_with_bodies = false
 
 [node name="RayCastE" type="RayCast2D" parent="I_body"]
 position = Vector2(24, -8)

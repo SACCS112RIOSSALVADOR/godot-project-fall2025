@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://4siuo2i16dah" path="res://project/scripts/tetromino.gd" id="1_s0n8s"]
 [ext_resource type="PackedScene" uid="uid://dwa3fxru4oo3h" path="res://project/scene/i_tetromino.tscn" id="2_ev68y"]
-[ext_resource type="Texture2D" uid="uid://b4506yea0r10n" path="res://project/assets/T-TertrominoB.png" id="2_itnri"]
-[ext_resource type="Texture2D" uid="uid://basvd5sqgbhcj" path="res://project/assets/O-TertrominoB.png" id="4_rgba7"]
+[ext_resource type="PackedScene" uid="uid://dwrvov0flvajq" path="res://project/scene/t_tetromino.tscn" id="3_ev68y"]
+[ext_resource type="PackedScene" uid="uid://do0e8dcj62rtk" path="res://project/scene/o_tetromino.tscn" id="4_ev68y"]
 [ext_resource type="Texture2D" uid="uid://c3lg3iwykohi2" path="res://project/assets/S-TertrominoB.png" id="5_ev68y"]
 [ext_resource type="Texture2D" uid="uid://b5ew0m6rk4qi3" path="res://project/assets/Z-TertromioB.png" id="6_arkor"]
 [ext_resource type="Texture2D" uid="uid://bwbjciov7mvq6" path="res://project/assets/L-TertrominoB.png" id="7_a6jdi"]
@@ -14,38 +14,9 @@ script = ExtResource("1_s0n8s")
 
 [node name="I_tetromino" parent="." instance=ExtResource("2_ev68y")]
 
-[node name="T_tetromino" type="Node2D" parent="."]
-visible = false
+[node name="T_tetromino" parent="." instance=ExtResource("3_ev68y")]
 
-[node name="T_body" type="CharacterBody2D" parent="T_tetromino"]
-position = Vector2(24, 8)
-input_pickable = true
-
-[node name="T_collision" type="CollisionPolygon2D" parent="T_tetromino/T_body"]
-visible = false
-position = Vector2(0, -4)
-polygon = PackedVector2Array(-24, -4, -8, -4, -8, -20, 8, -20, 8, -4, 24, -4, 24, 12, 8, 12, -8, 12, -24, 12)
-
-[node name="T_shape" type="Sprite2D" parent="T_tetromino/T_body"]
-texture_filter = 1
-texture = ExtResource("2_itnri")
-offset = Vector2(0, -8)
-
-[node name="O_tetromino" type="Node2D" parent="."]
-visible = false
-
-[node name="O_body" type="CharacterBody2D" parent="O_tetromino"]
-position = Vector2(16, 0)
-input_pickable = true
-
-[node name="O_collision" type="CollisionPolygon2D" parent="O_tetromino/O_body"]
-visible = false
-position = Vector2(-16, 0)
-polygon = PackedVector2Array(0, -16, 32, -16, 32, 16, 0, 16)
-
-[node name="O_shape" type="Sprite2D" parent="O_tetromino/O_body"]
-texture_filter = 1
-texture = ExtResource("4_rgba7")
+[node name="O_tetromino" parent="." instance=ExtResource("4_ev68y")]
 
 [node name="S_tetromino" type="Node2D" parent="."]
 visible = false
