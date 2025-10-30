@@ -59,7 +59,8 @@ func check_all_collissions()-> bool:
 
 func perform_rotaion():
 	if currentRota <= 360:
-		global_rotation_degrees += 90
+		global_rotation_degrees += 90.0
+		global_rotation_degrees = round(global_rotation_degrees)
 		if check_all_collissions()==false:
 			currentRota = global_rotation_degrees
 			print("moved 90 degrees")
