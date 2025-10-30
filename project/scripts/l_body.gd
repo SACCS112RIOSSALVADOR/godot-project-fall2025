@@ -1,3 +1,4 @@
+# l_body.gd
 extends CharacterBody2D
 
 const tile_size = 16
@@ -13,9 +14,14 @@ var input_dir
 var default_compass = raycast_compass 
 
 #note rotation should happen global_rotation
-func change_compass(new_rota):
-	if new_rota == 0:
-		raycast_compass = default_compass
+func change_compass():
+	if currentRota == 0.0:
+		global_rotation_degrees = 90.0
+		if check_all_collissions()==false:
+			currentRota = global_rotation_degrees
+			print("moved 90 degress")
+		elif check_all_collissions()== true:
+			global_rotation_degrees = currentRota
 
 #Switch function for when the Shape is selected
 func _on_area_2d_input_event(_viewport, event, _shape_idx):
@@ -36,10 +42,37 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 func check_collission(input)-> bool:
 	for rays in raycast_compass[input]:
 		if rays.is_colliding():
-			print("true")
+			print("collission")
 			return true
-	print("false")
+	print("no collission")
 	return false
+
+func check_all_collissions()-> bool:
+	if check_collission("right") == true:
+		return true
+	elif check_collission("left") == true:
+		return true
+	elif check_collission("up") == true:
+		return true
+	elif check_collission("down") == true:
+		return true
+	return false
+
+func perform_rotaion():
+	if currentRota != 360:
+		global_rotation_degrees += 90
+		if check_all_collissions()==false:
+			currentRota = global_rotation_degrees
+			print("moved 90 degrees")
+		else:
+			global_rotation_degrees = currentRota
+	else:
+		global_rotation_degrees = 0
+		if check_all_collissions()==false:
+			currentRota = global_rotation_degrees
+			print("moved back to 0 degrees")
+		else:
+			global_rotation_degrees = currentRota
 
 #main function for movement
 func _physics_process(delta: float) -> void:
@@ -55,6 +88,10 @@ func _physics_process(delta: float) -> void:
 				_move(Vector2(0,-1))
 			elif Input.is_action_just_pressed("ui_down") and check_collission("down") == false:
 				_move(Vector2(0,1))
+				
+		if Input.is_action_just_pressed("space"):
+			perform_rotaion()
+			
 
 #tweening function for movement
 func _move(dir:Vector2):
