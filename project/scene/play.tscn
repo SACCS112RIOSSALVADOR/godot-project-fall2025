@@ -1,10 +1,14 @@
-[gd_scene load_steps=8 format=4 uid="uid://xyubiujw3nyd"]
+[gd_scene load_steps=12 format=4 uid="uid://xyubiujw3nyd"]
 
 [ext_resource type="Texture2D" uid="uid://0ajk0kctpong" path="res://project/assets/small_tetrominos.png" id="1_oscul"]
 [ext_resource type="Script" uid="uid://cugoym7ghi2sg" path="res://project/scripts/play.gd" id="1_sp4nc"]
 [ext_resource type="PackedScene" uid="uid://dwa3fxru4oo3h" path="res://project/scene/i_tetromino.tscn" id="3_sp4nc"]
 [ext_resource type="PackedScene" uid="uid://dwrvov0flvajq" path="res://project/scene/t_tetromino.tscn" id="4_cgadb"]
 [ext_resource type="PackedScene" uid="uid://do0e8dcj62rtk" path="res://project/scene/o_tetromino.tscn" id="5_7x04a"]
+[ext_resource type="PackedScene" uid="uid://cqivddxqtwqkk" path="res://project/scene/s_tetromino.tscn" id="6_js78h"]
+[ext_resource type="PackedScene" uid="uid://dotxkg2baprxh" path="res://project/scene/z_tetromino.tscn" id="7_fw0yx"]
+[ext_resource type="PackedScene" uid="uid://besrdc28fcimv" path="res://project/scene/l_tetromino.tscn" id="8_33wjm"]
+[ext_resource type="PackedScene" uid="uid://c8elvwv3hcd7c" path="res://project/scene/j_tetromino.tscn" id="9_so0f7"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_67hsh"]
 texture = ExtResource("1_oscul")
@@ -33,13 +37,25 @@ tile_set = SubResource("TileSet_sp4nc")
 [node name="Node2D" type="Node2D" parent="."]
 
 [node name="I_tetromino" parent="Node2D" instance=ExtResource("3_sp4nc")]
-position = Vector2(32, 32)
+position = Vector2(112, 256)
 
 [node name="T_tetromino" parent="Node2D" instance=ExtResource("4_cgadb")]
-position = Vector2(96, 64)
+position = Vector2(64, 256)
 
-[node name="O_tetromino" parent="." instance=ExtResource("5_7x04a")]
-position = Vector2(176, 48)
+[node name="O_tetromino" parent="Node2D" instance=ExtResource("5_7x04a")]
+position = Vector2(128, 240)
+
+[node name="S_tetromino" parent="Node2D" instance=ExtResource("6_js78h")]
+position = Vector2(32, 256)
+
+[node name="Z_tetromino" parent="Node2D" instance=ExtResource("7_fw0yx")]
+position = Vector2(80, 240)
+
+[node name="L_tetromino" parent="Node2D" instance=ExtResource("8_33wjm")]
+position = Vector2(160, 240)
+
+[node name="J_tetromino" parent="Node2D" instance=ExtResource("9_so0f7")]
+position = Vector2(176, 256)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(144, 144)
