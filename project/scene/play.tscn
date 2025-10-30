@@ -37,7 +37,7 @@ tile_set = SubResource("TileSet_sp4nc")
 [node name="Node2D" type="Node2D" parent="."]
 
 [node name="I_tetromino" parent="Node2D" instance=ExtResource("3_sp4nc")]
-position = Vector2(112, 256)
+position = Vector2(128, 208)
 
 [node name="T_tetromino" parent="Node2D" instance=ExtResource("4_cgadb")]
 position = Vector2(64, 256)
@@ -49,7 +49,7 @@ position = Vector2(128, 240)
 position = Vector2(32, 256)
 
 [node name="Z_tetromino" parent="Node2D" instance=ExtResource("7_fw0yx")]
-position = Vector2(80, 240)
+position = Vector2(40, 192)
 
 [node name="L_tetromino" parent="Node2D" instance=ExtResource("8_33wjm")]
 position = Vector2(160, 240)

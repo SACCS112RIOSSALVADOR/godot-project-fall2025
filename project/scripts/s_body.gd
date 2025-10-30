@@ -9,7 +9,7 @@ var is_selected = false
 var input_dir
 
 #swap vaules from their keys when rotation happens
-@onready var raycast_compass = {"down":[$RayCastA, $RayCastB, $RayCastC, $RayCastD],"right":[$RayCastE],"left":[$RayCastF],"up":[$RayCastG, $RayCastH, $RayCastI, $RayCastJ]}
+@onready var raycast_compass = {"down":[$RayCastA, $RayCastB, $RayCastC],"right":[$RayCastD, $RayCastE],"left":[$RayCastF, $RayCastG],"up":[$RayCastH, $RayCastI, $RayCastJ]}
 var default_compass = raycast_compass 
 
 #note rotation should happen global_rotation
@@ -27,18 +27,18 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 			is_selected = not is_selected
 			
 			if is_selected:
-				print("S Teromino clicked on! State is now TRUE.")
+				print("S Tetromino clicked on! State is now TRUE.")
 			else:
-				print("S Teromino clicked off! State is now FALSE.")
+				print("S Tetromino clicked off! State is now FALSE.")
 				
 				
-#detects if their is a collission with raycats
+#detects if their is a collission on the right
 func check_collission(input)-> bool:
 	for rays in raycast_compass[input]:
 		if rays.is_colliding():
-			print("path blocked")
+			print("true")
 			return true
-	print("path open")
+	print("false")
 	return false
 
 #main function for movement
