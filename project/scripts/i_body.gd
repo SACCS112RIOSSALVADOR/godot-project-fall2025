@@ -58,11 +58,12 @@ func check_all_collissions()-> bool:
 	return false
 
 func perform_rotaion():
-	if currentRota != 360:
+	if currentRota <= 360:
 		global_rotation_degrees += 90
 		if check_all_collissions()==false:
 			currentRota = global_rotation_degrees
 			print("moved 90 degrees")
+			print("currentRota = %s" % currentRota)
 		else:
 			global_rotation_degrees = currentRota
 	else:
