@@ -27,9 +27,9 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 			is_selected = not is_selected
 			
 			if is_selected:
-				print("Object clicked on! State is now TRUE.")
+				print("I Object clicked on! State is now TRUE.")
 			else:
-				print("Object clicked off! State is now FALSE.")
+				print("I Object clicked off! State is now FALSE.")
 				
 				
 #detects if their is a collission with raycasts

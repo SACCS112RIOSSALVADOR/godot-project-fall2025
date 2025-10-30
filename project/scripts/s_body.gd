@@ -27,9 +27,9 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 			is_selected = not is_selected
 			
 			if is_selected:
-				print("J Teromino clicked on! State is now TRUE.")
+				print("S Teromino clicked on! State is now TRUE.")
 			else:
-				print("J Teromino clicked off! State is now FALSE.")
+				print("S Teromino clicked off! State is now FALSE.")
 				
 				
 #detects if their is a collission with raycats
@@ -59,10 +59,10 @@ func _physics_process(delta: float) -> void:
 #tweening function for movement
 func _move(dir:Vector2):
 	global_position += dir * tile_size
-	$J_shape.global_position -=dir * tile_size
+	$S_shape.global_position -=dir * tile_size
 	
 	if sprite_node_pos_tween:
 		sprite_node_pos_tween.kill()
 	sprite_node_pos_tween = create_tween()
 	sprite_node_pos_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
-	sprite_node_pos_tween.tween_property($J_shape,"global_position", global_position, 0.185).set_trans(Tween.TRANS_SINE)
+	sprite_node_pos_tween.tween_property($S_shape,"global_position", global_position, 0.185).set_trans(Tween.TRANS_SINE)
