@@ -9,7 +9,7 @@ var is_selected = false
 var input_dir
 
 #swap vaules from their keys when rotation happens
-@onready var raycast_compass = {"down":[$RayCastA, $RayCastB],"right":[$RayCastC, $RayCastD],"left":[$RayCastE, $RayCastF],"up":[$RayCastG, $RayCastH]}
+@onready var raycast_compass = {"down":[$RayCastA, $RayCastB, $RayCastC, $RayCastD],"right":[$RayCastE],"left":[$RayCastF],"up":[ $RayCastG, $RayCastH, $RayCastI, $RayCastJ]}
 var default_compass = raycast_compass 
 
 #note rotation should happen global_rotation
@@ -27,12 +27,12 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 			is_selected = not is_selected
 			
 			if is_selected:
-				print("O Object clicked on! State is now TRUE.")
+				print("L Object clicked on! State is now TRUE.")
 			else:
-				print("O Object clicked off! State is now FALSE.")
+				print("L Object clicked off! State is now FALSE.")
 				
 				
-#detects if their is a collission on the right
+#detects if their is a collission with raycasts
 func check_collission(input)-> bool:
 	for rays in raycast_compass[input]:
 		if rays.is_colliding():
@@ -59,10 +59,10 @@ func _physics_process(delta: float) -> void:
 #tweening function for movement
 func _move(dir:Vector2):
 	global_position += dir * tile_size
-	$O_shape.global_position -=dir * tile_size
+	$L_shape.global_position -=dir * tile_size
 	
 	if sprite_node_pos_tween:
 		sprite_node_pos_tween.kill()
 	sprite_node_pos_tween = create_tween()
 	sprite_node_pos_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
-	sprite_node_pos_tween.tween_property($O_shape,"global_position", global_position, 0.185).set_trans(Tween.TRANS_SINE)
+	sprite_node_pos_tween.tween_property($L_shape,"global_position", global_position, 0.185).set_trans(Tween.TRANS_SINE)
