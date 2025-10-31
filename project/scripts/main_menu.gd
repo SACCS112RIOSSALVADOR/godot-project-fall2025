@@ -1,17 +1,19 @@
 extends Control
 
+#References
 @onready var main_menu_buttons: VBoxContainer = $main_menu_buttons
 @onready var settings_panel: Panel = $settings_panel
 
-# Called when the node enters the scene tree for the first time.
+# Main Menu
 func _ready():
 	main_menu_buttons.visible = true
 	settings_panel.visible = false
+# Show menu and hide settings panel when app runs.
 
 # Start button function
 func _on_start_pressed():
-	get_tree().change_scene_to_file("res://project/scene/tile_map.tscn") 
-	# when clicked Start, change scene to tile_map.tscn
+	get_tree().change_scene_to_file("res://project/scene/tile_map.tscn")
+	# when Start is clicked, change scene to tile_map.tscn
 	
 # Settings button function
 func _on_settings_pressed():
