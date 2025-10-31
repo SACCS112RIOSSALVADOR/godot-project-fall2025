@@ -1,12 +1,6 @@
 class_name Tetromino
 extends Node2D
 
-
-
-const ZERO_D : int = 0
-const NINTY_D : int = 90
-const ONEEIGHTY : int = 180
-const TWOSEVENTY : int = 270
 enum {I,T,O,S,Z,L,J}
 
 var health : int = 10
