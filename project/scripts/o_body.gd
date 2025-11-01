@@ -36,7 +36,6 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 			else:
 				print("O Object clicked off! State is now FALSE.")
 				
-				
 #detects if their is a collission with raycasts
 func check_collission(input)-> bool:
 	for rays in raycast_compass[input]:
