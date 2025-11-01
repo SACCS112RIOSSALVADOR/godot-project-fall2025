@@ -12,7 +12,7 @@ func _ready():
 
 # Start button function
 func _on_start_pressed():
-	get_tree().change_scene_to_file("res://project/scene/play.tscn")
+	get_tree().change_scene_to_file("res://project/scene/tile_map.tscn")
 	# when Start is clicked, change scene to tile_map.tscn
 	
 # Settings button function
