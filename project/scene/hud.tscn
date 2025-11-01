@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dq0xmkuctiirq"]
+[gd_scene load_steps=5 format=3 uid="uid://dq0xmkuctiirq"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dfiai"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -7,6 +7,15 @@ border_width_top = 5
 border_width_right = 5
 border_width_bottom = 5
 border_color = Color(0.0605304, 0.0605303, 0.0605303, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pvgpj"]
+bg_color = Color(0.216654, 0.704525, 0.411893, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o8u2p"]
+bg_color = Color(0.593641, 0.533201, 0.927003, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s3k51"]
+bg_color = Color(0.16693, 0.650338, 0.856429, 1)
 
 [node name="HUD" type="CanvasLayer"]
 
@@ -46,3 +55,14 @@ theme_override_font_sizes/font_size = 40
 text = "Game Over"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="RestartButton" type="Button" parent="."]
+offset_left = 430.0
+offset_top = 500.0
+offset_right = 610.0
+offset_bottom = 540.0
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_pvgpj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_o8u2p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_s3k51")
+text = "Restart"

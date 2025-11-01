@@ -106,6 +106,7 @@ var active_layer : int = 1  # Layer for the currently moving piece
 # Called when the node enters the scene tree for the first time
 func _ready():
 	new_game()
+	$HUD.get_node("RestartButton").pressed.connect(new_game)
 	
 # Initialize a new game session
 func new_game():
@@ -258,7 +259,7 @@ func is_free(pos):
 
 # ============================================
 # BOARD MANAGEMENT FUNCTIONS
-# ============================================ 
+# ============================================
 
 # Lock the current piece onto the board layer
 # Transfers blocks from active layer to board layer
