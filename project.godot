@@ -15,6 +15,10 @@ run/main_scene="uid://crk7beciiao70"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+SelectionManager="*res://project/scripts/SelectionManager.gd"
+
 [display]
 
 window/size/viewport_width=720

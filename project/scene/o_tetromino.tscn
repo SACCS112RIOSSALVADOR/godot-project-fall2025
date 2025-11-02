@@ -11,7 +11,6 @@ input_pickable = true
 script = ExtResource("1_he7wr")
 
 [node name="O_collision" type="CollisionPolygon2D" parent="O_body"]
-visible = false
 position = Vector2(-16, 0)
 polygon = PackedVector2Array(0, -16, 32, -16, 32, 16, 0, 16)
 
@@ -24,35 +23,43 @@ texture = ExtResource("2_f4fkx")
 [node name="Collision_box" type="CollisionPolygon2D" parent="O_body/Area2D"]
 polygon = PackedVector2Array(16, -16, -16, -16, -16, 16, 16, 16)
 
-[node name="RayCastA" type="RayCast2D" parent="O_body"]
+[node name="RayCastA" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
 position = Vector2(8, 8)
 target_position = Vector2(0, 16)
 
-[node name="RayCastB" type="RayCast2D" parent="O_body"]
+[node name="RayCastB" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
 position = Vector2(-8, 8)
 target_position = Vector2(0, 16)
 
-[node name="RayCastC" type="RayCast2D" parent="O_body"]
+[node name="RayCastC" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
 position = Vector2(8, -8)
 target_position = Vector2(16, 0)
 
-[node name="RayCastD" type="RayCast2D" parent="O_body"]
+[node name="RayCastD" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
 position = Vector2(8, 8)
 target_position = Vector2(16, 0)
 
-[node name="RayCastE" type="RayCast2D" parent="O_body"]
+[node name="RayCastE" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
 position = Vector2(-8, 8)
 target_position = Vector2(-16, 0)
 
-[node name="RayCastF" type="RayCast2D" parent="O_body"]
+[node name="RayCastF" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
 position = Vector2(-8, -8)
 target_position = Vector2(-16, 0)
 
-[node name="RayCastG" type="RayCast2D" parent="O_body"]
+[node name="RayCastG" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
 position = Vector2(-8, -8)
 target_position = Vector2(0, -16)
 
-[node name="RayCastH" type="RayCast2D" parent="O_body"]
+[node name="RayCastH" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(8, -8)
+target_position = Vector2(0, -16)
+
+[node name="RayCastI" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(8, -8)
+target_position = Vector2(0, -16)
+
+[node name="RayCastJ" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
 position = Vector2(8, -8)
 target_position = Vector2(0, -16)
 

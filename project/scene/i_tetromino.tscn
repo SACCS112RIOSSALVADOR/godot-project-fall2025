@@ -26,52 +26,52 @@ position = Vector2(0, -8)
 [node name="Selection_box" type="CollisionPolygon2D" parent="I_body/Area2D"]
 polygon = PackedVector2Array(-32, 8, 32, 8, 32, -8, -32, -8)
 
-[node name="RayCastA" type="RayCast2D" parent="I_body"]
+[node name="RayCastA" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(24, -8)
 target_position = Vector2(0, 16)
 hit_from_inside = true
 
-[node name="RayCastB" type="RayCast2D" parent="I_body"]
+[node name="RayCastB" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(8, -8)
 target_position = Vector2(0, 16)
 hit_from_inside = true
 
-[node name="RayCastC" type="RayCast2D" parent="I_body"]
+[node name="RayCastC" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(-8, -8)
 target_position = Vector2(0, 16)
 hit_from_inside = true
 
-[node name="RayCastD" type="RayCast2D" parent="I_body"]
+[node name="RayCastD" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(-24, -8)
 target_position = Vector2(0, 16)
 hit_from_inside = true
 
-[node name="RayCastE" type="RayCast2D" parent="I_body"]
+[node name="RayCastE" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(24, -8)
 target_position = Vector2(16, 0)
 hit_from_inside = true
 
-[node name="RayCastF" type="RayCast2D" parent="I_body"]
+[node name="RayCastF" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(-24, -8)
 target_position = Vector2(-16, 0)
 hit_from_inside = true
 
-[node name="RayCastG" type="RayCast2D" parent="I_body"]
+[node name="RayCastG" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(-24, -8)
 target_position = Vector2(0, -16)
 hit_from_inside = true
 
-[node name="RayCastH" type="RayCast2D" parent="I_body"]
+[node name="RayCastH" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(-8, -8)
 target_position = Vector2(0, -16)
 hit_from_inside = true
 
-[node name="RayCastI" type="RayCast2D" parent="I_body"]
+[node name="RayCastI" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(8, -8)
 target_position = Vector2(0, -16)
 hit_from_inside = true
 
-[node name="RayCastJ" type="RayCast2D" parent="I_body"]
+[node name="RayCastJ" type="RayCast2D" parent="I_body" groups=["shape_raycast"]]
 position = Vector2(24, -8)
 target_position = Vector2(0, -16)
 hit_from_inside = true
