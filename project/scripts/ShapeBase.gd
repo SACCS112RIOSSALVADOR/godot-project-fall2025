@@ -54,19 +54,22 @@ func check_collision(direction: String) -> bool:
 		if ray == null or !ray.enabled:
 			continue  # skip missing or disabled rays
 
-		# Compare each ray’s target direction to the desired movement direction.
+		# Transform the ray's local target position to global space to account for rotation
+		var global_ray_dir := ray.target_position.rotated(global_rotation)
+		
+		# Compare each ray's GLOBAL direction to the desired movement direction.
 		match direction:
 			"right":
-				if ray.target_position.x > 0 and ray.is_colliding():
+				if global_ray_dir.x > 0 and ray.is_colliding():
 					return true
 			"left":
-				if ray.target_position.x < 0 and ray.is_colliding():
+				if global_ray_dir.x < 0 and ray.is_colliding():
 					return true
 			"up":
-				if ray.target_position.y < 0 and ray.is_colliding():
+				if global_ray_dir.y < 0 and ray.is_colliding():
 					return true
 			"down":
-				if ray.target_position.y > 0 and ray.is_colliding():
+				if global_ray_dir.y > 0 and ray.is_colliding():
 					return true
 	return false
 
