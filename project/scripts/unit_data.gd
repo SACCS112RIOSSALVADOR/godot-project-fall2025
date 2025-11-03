@@ -6,8 +6,10 @@ class_name UnitData extends Resource
 @export var health: int = 100
 @export var strength: int = 10
 @export var team: bool
+@export var remaining_steps: int
 @export var actionable: bool = true
 
+signal lose_turn
 signal health_depleted
 signal health_changed(old_value, new_value)
 signal team_A_signal
@@ -30,6 +32,15 @@ var steps: int = 0
 # ... other character data
 var ally_adjacent: bool
 var foe_adjacent: bool
+
+func actionsleft():
+	if remaining_steps <= 0:
+		actionable = false
+		lose_turn.emit()
+	elif remaining_steps >= 0:
+		actionable = true
+		remaining_steps = remaining_steps - 1
+		
 
 
 # In another script (e.g., a game manager or character spawner) for later
