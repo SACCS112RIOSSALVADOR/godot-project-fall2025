@@ -6,8 +6,9 @@ class_name UnitData extends Resource
 @export var health: int = 100
 @export var strength: int = 10
 @export var team: bool
-@export var remaining_steps: int
+@export var remaining_steps: int = 3
 @export var actionable: bool = true
+@export var in_combat: bool
 
 signal lose_turn
 signal health_depleted
