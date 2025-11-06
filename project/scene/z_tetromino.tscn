@@ -34,7 +34,7 @@ target_position = Vector2(0, 16)
 
 [node name="RayCastC" type="RayCast2D" parent="Z_body" groups=["shape_raycast"]]
 position = Vector2(-16, -16)
-target_position = Vector2(0, 16)
+target_position = Vector2(-16, 0)
 
 [node name="RayCastD" type="RayCast2D" parent="Z_body" groups=["shape_raycast"]]
 position = Vector2(16, 0)
@@ -56,10 +56,14 @@ position = Vector2(-16, -16)
 target_position = Vector2(0, -16)
 
 [node name="RayCastI" type="RayCast2D" parent="Z_body" groups=["shape_raycast"]]
+position = Vector2(-16, -16)
+target_position = Vector2(0, 16)
+
+[node name="RayCastJ" type="RayCast2D" parent="Z_body" groups=["shape_raycast"]]
 position = Vector2(0, -16)
 target_position = Vector2(0, -16)
 
-[node name="RayCastJ" type="RayCast2D" parent="Z_body" groups=["shape_raycast"]]
+[node name="RayCastK" type="RayCast2D" parent="Z_body" groups=["shape_raycast"]]
 position = Vector2(16, 0)
 target_position = Vector2(0, -16)
 
