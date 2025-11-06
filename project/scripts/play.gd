@@ -1,27 +1,55 @@
 extends Node2D
 
-# Game variables
 var score : int
 const REWARD : int = 100
 var game_running : bool 
 var team : bool 
 var pieces_remaining : int = 7
+var is_paused : bool = false
 
+# Reference to your pause menu panel (adjust the path to match your scene tree)
+@onready var pause_panel = $PausePanel  # Change this to match your actual node path
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	# Make sure pause panel is hidden at start
+	if pause_panel:
+		pause_panel.visible = false
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	if game_running:
+	# Check for pause input
+	if Input.is_action_just_pressed("ui_cancel"):  # ESC key
+		toggle_pause()
+	
+	if game_running and !is_paused:
 		pass
+
+func toggle_pause():
+	is_paused = !is_paused
+	
+	if is_paused:
+		# Pause the game
+		get_tree().paused = true
+		if pause_panel:
+			pause_panel.visible = true
+	else:
+		# Resume the game
+		get_tree().paused = false
+		if pause_panel:
+			pause_panel.visible = false
+
+func resume_game():
+	is_paused = false
+	get_tree().paused = false
+	if pause_panel:
+		pause_panel.visible = false
 
 func newgame():
 	clear_board()
 	game_running = true
-	pass
+	is_paused = false
+	get_tree().paused = false
+	if pause_panel:
+		pause_panel.visible = false
 
 func clear_board():
 	pass
