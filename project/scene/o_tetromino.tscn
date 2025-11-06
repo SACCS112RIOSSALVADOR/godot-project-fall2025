@@ -1,8 +1,66 @@
-[gd_scene load_steps=2 format=3 uid="uid://do0e8dcj62rtk"]
+[gd_scene load_steps=3 format=3 uid="uid://do0e8dcj62rtk"]
 
-[ext_resource type="PackedScene" uid="uid://cl6b0d4mnn82c" path="res://project/scene/o_tetro.tscn" id="1_vj5fo"]
+[ext_resource type="Script" uid="uid://btwy5lta05020" path="res://project/scripts/o_body.gd" id="1_he7wr"]
+[ext_resource type="Texture2D" uid="uid://basvd5sqgbhcj" path="res://project/assets/O-TertrominoB.png" id="2_f4fkx"]
 
 [node name="O_tetromino" type="Node2D"]
 
-[node name="O_body" parent="." instance=ExtResource("1_vj5fo")]
+[node name="O_body" type="CharacterBody2D" parent="."]
 position = Vector2(16, 0)
+input_pickable = true
+script = ExtResource("1_he7wr")
+
+[node name="O_collision" type="CollisionPolygon2D" parent="O_body"]
+position = Vector2(-16, 0)
+polygon = PackedVector2Array(0, -16, 32, -16, 32, 16, 0, 16)
+
+[node name="O_shape" type="Sprite2D" parent="O_body"]
+texture_filter = 1
+texture = ExtResource("2_f4fkx")
+
+[node name="Area2D" type="Area2D" parent="O_body"]
+
+[node name="Collision_box" type="CollisionPolygon2D" parent="O_body/Area2D"]
+polygon = PackedVector2Array(16, -16, -16, -16, -16, 16, 16, 16)
+
+[node name="RayCastA" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(8, 8)
+target_position = Vector2(0, 16)
+
+[node name="RayCastB" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(-8, 8)
+target_position = Vector2(0, 16)
+
+[node name="RayCastC" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(8, -8)
+target_position = Vector2(16, 0)
+
+[node name="RayCastD" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(8, 8)
+target_position = Vector2(16, 0)
+
+[node name="RayCastE" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(-8, 8)
+target_position = Vector2(-16, 0)
+
+[node name="RayCastF" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(-8, -8)
+target_position = Vector2(-16, 0)
+
+[node name="RayCastG" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(-8, -8)
+target_position = Vector2(0, -16)
+
+[node name="RayCastH" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(8, -8)
+target_position = Vector2(0, -16)
+
+[node name="RayCastI" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(8, -8)
+target_position = Vector2(0, -16)
+
+[node name="RayCastJ" type="RayCast2D" parent="O_body" groups=["shape_raycast"]]
+position = Vector2(8, -8)
+target_position = Vector2(0, -16)
+
+[connection signal="input_event" from="O_body/Area2D" to="O_body" method="_on_area_2d_input_event"]
