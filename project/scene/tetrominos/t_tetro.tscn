@@ -1,0 +1,64 @@
+[gd_scene load_steps=3 format=3 uid="uid://b3sfhhvkakdvl"]
+
+[ext_resource type="Script" uid="uid://ctei416gjjt6b" path="res://project/scripts/t_body.gd" id="1_ii83b"]
+[ext_resource type="Texture2D" uid="uid://b4506yea0r10n" path="res://project/assets/T-TertrominoB.png" id="2_iyw41"]
+
+[node name="T_body" type="CharacterBody2D"]
+input_pickable = true
+script = ExtResource("1_ii83b")
+
+[node name="T_collision" type="CollisionPolygon2D" parent="."]
+visible = false
+position = Vector2(0, -4)
+polygon = PackedVector2Array(-24, -4, -8, -4, -8, -20, 8, -20, 8, -4, 24, -4, 24, 12, 8, 12, -8, 12, -24, 12)
+
+[node name="T_shape" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_iyw41")
+offset = Vector2(0, -8)
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="Selection_box" type="CollisionPolygon2D" parent="Area2D"]
+polygon = PackedVector2Array(-24, -8, -8, -8, -8, -24, 8, -24, 8, -8, 24, -8, 24, 8, -24, 8)
+
+[node name="RayCastA" type="RayCast2D" parent="." groups=["shape_raycast"]]
+position = Vector2(16, 0)
+target_position = Vector2(0, 16)
+
+[node name="RayCastB" type="RayCast2D" parent="." groups=["shape_raycast"]]
+target_position = Vector2(0, 16)
+
+[node name="RayCastC" type="RayCast2D" parent="." groups=["shape_raycast"]]
+position = Vector2(-16, 0)
+target_position = Vector2(0, 16)
+
+[node name="RayCastD" type="RayCast2D" parent="." groups=["shape_raycast"]]
+position = Vector2(16, 0)
+target_position = Vector2(16, 0)
+
+[node name="RayCastE" type="RayCast2D" parent="." groups=["shape_raycast"]]
+position = Vector2(0, -16)
+target_position = Vector2(16, 0)
+
+[node name="RayCastF" type="RayCast2D" parent="." groups=["shape_raycast"]]
+position = Vector2(-16, 0)
+target_position = Vector2(-16, 0)
+
+[node name="RayCastG" type="RayCast2D" parent="." groups=["shape_raycast"]]
+position = Vector2(0, -16)
+target_position = Vector2(-16, 0)
+
+[node name="RayCastH" type="RayCast2D" parent="." groups=["shape_raycast"]]
+position = Vector2(-16, 0)
+target_position = Vector2(0, -16)
+
+[node name="RayCastI" type="RayCast2D" parent="." groups=["shape_raycast"]]
+position = Vector2(0, -16)
+target_position = Vector2(0, -16)
+
+[node name="RayCastJ" type="RayCast2D" parent="." groups=["shape_raycast"]]
+position = Vector2(16, 0)
+target_position = Vector2(0, -16)
+
+[connection signal="input_event" from="Area2D" to="." method="_on_area_2d_input_event"]
