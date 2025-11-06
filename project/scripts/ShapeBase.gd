@@ -18,6 +18,14 @@ var raycasts: Array[RayCast2D] = []         # automatically filled with this sha
 
 # --- Initialization ---
 func _ready():
+	
+	var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")
+	if loaded_data:
+		#print("Loaded character: " + loaded_data.character_name)
+		print("Health: " + str(loaded_data.health))
+	else:
+		print("Failed to load character data.")
+	
 	# Collect all RayCast2D nodes under this shape so we don’t have to hard-code names.
 	for child in get_children():
 		if child is RayCast2D:
@@ -131,9 +139,10 @@ func _move(direction: Vector2):
 	# Create a new tween for smooth visual motion of the sprite only.
 	sprite_node_pos_tween = create_tween()
 	sprite_node_pos_tween.set_parallel(true)
+	sprite_node_pos_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	sprite_node_pos_tween.tween_property(
 		shape_sprite, 
 		"global_position", 
 		new_pos, 
-		0.18
+		0.185
 	).set_trans(Tween.TRANS_SINE)

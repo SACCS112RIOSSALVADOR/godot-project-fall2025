@@ -9,6 +9,7 @@ class_name UnitData extends Resource
 @export var remaining_steps: int = 3
 @export var actionable: bool = true
 @export var in_combat: bool
+@export_enum("I","T","O","S","Z","L","J") var shape_type: String
 
 signal lose_turn
 signal health_depleted
@@ -29,11 +30,6 @@ func team_assign():
 	else:
 		team_B_signal.emit()
 
-var steps: int = 0
-# ... other character data
-var ally_adjacent: bool
-var foe_adjacent: bool
-
 func actionsleft():
 	if remaining_steps <= 0:
 		actionable = false
@@ -46,7 +42,7 @@ func actionsleft():
 
 # In another script (e.g., a game manager or character spawner) for later
 func _ready():
-	var loaded_data: UnitData = load("res://path/to/your/character_data.tres")
+	var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")
 	if loaded_data:
 		#print("Loaded character: " + loaded_data.character_name)
 		print("Health: " + str(loaded_data.health))
