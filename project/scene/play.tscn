@@ -96,7 +96,7 @@ theme_override_font_sizes/font_size = 15
 text = "Esc to Pause"
 
 [node name="PausePanel" type="Panel" parent="."]
-anchors_preset = -1
+visible = false
 offset_left = 81.0
 offset_top = 96.0
 offset_right = 193.0
