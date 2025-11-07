@@ -23,7 +23,6 @@ func _ready() -> void:
 		var tetro_instance = teromino_scene.instantiate()
 		#tetro_instance.set_rotation_degrees(90)
 		tetro_instance.set_team(true)
-
 		tetro_instance.position = player_positions[i]
 		add_child(tetro_instance)
 		

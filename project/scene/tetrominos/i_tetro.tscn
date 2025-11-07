@@ -9,6 +9,7 @@ input_pickable = true
 script = ExtResource("1_6y8yy")
 
 [node name="I_collision" type="CollisionPolygon2D" parent="."]
+visible = false
 position = Vector2(-32, -16)
 polygon = PackedVector2Array(0, 0, 0, 16, 64, 16, 64, 0)
 

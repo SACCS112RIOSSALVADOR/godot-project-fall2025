@@ -10,7 +10,7 @@ var is_selected := false  # Whether this shape is currently selected by the play
 var raycasts: Array[RayCast2D] = []  # Array of raycasts used for collision detection
 
 # Node references
-@onready var shape_sprite: Node2D = get_child(0)  # Reference to the visual sprite
+@onready var shape_sprite: Node2D = get_child(1)  # Reference to the visual sprite
 
 # Sound effect players
 @onready var click_sound: AudioStreamPlayer = $ClickSound  # Sound for selecting/deselecting
@@ -37,6 +37,9 @@ func _ready():
 		print("Health: " + str(loaded_data.health))
 	else:
 		print("Failed to load character data.")
+	
+	if team == false:
+		shape_sprite.modulate = Color(0.528, 0.205, 0.105, 0.945)
 	
 	# Collect all RayCast2D nodes from children (both direct and nested)
 	for child in get_children():
