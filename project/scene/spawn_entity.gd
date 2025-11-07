@@ -12,8 +12,9 @@ var tetrominos = [
 
 var num_entities_on_start = 7
 
-var player_positions = [Vector2(120,272),Vector2(96,216), Vector2(144,216),Vector2(72,256),Vector2(176,264),Vector2(112,248),Vector2(144,248)]
+var player_positions = [Vector2(128,272),Vector2(104,216), Vector2(152,216),Vector2(80,256),Vector2(184,264),Vector2(120,248),Vector2(152,248)]
 
+var foe_positions = [Vector2(128,96),Vector2(104,40), Vector2(152,40),Vector2(80,80),Vector2(184,88),Vector2(120,72),Vector2(152,72)]
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
@@ -25,6 +26,12 @@ func _ready() -> void:
 
 		tetro_instance.position = player_positions[i]
 		add_child(tetro_instance)
+		
+		var foe_tetro_scene = tetrominos[i]
+		var foe_instance = foe_tetro_scene.instantiate()
+		foe_instance.set_team(false)
+		foe_instance.position = foe_positions[i]
+		add_child(foe_instance)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
