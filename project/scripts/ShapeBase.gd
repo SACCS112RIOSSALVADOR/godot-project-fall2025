@@ -16,10 +16,22 @@ var raycasts: Array[RayCast2D] = []         # automatically filled with this sha
 # first child is usually the visible part of the shape (Node2D/Sprite2D/etc.)
 @onready var shape_sprite: Node2D = get_child(0)
 
+var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")
+var team: bool
+
+func set_team(flag):
+	team = flag
+	if team == true:
+		loaded_data.team = true
+	else:
+		loaded_data.team = false
+	print(team)
+	pass
+
 # --- Initialization ---
 func _ready():
 	
-	var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")
+	#var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")
 	if loaded_data:
 		#print("Loaded character: " + loaded_data.character_name)
 		print("Health: " + str(loaded_data.health))

@@ -20,6 +20,9 @@ func _ready() -> void:
 	for i in range(num_entities_on_start):
 		var teromino_scene = tetrominos[i]
 		var tetro_instance = teromino_scene.instantiate()
+		#tetro_instance.set_rotation_degrees(90)
+		tetro_instance.set_team(true)
+
 		tetro_instance.position = player_positions[i]
 		add_child(tetro_instance)
 
