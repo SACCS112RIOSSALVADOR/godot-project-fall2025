@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://1j0rlagtkexa"]
+[gd_scene load_steps=4 format=3 uid="uid://1j0rlagtkexa"]
 
 [ext_resource type="Script" uid="uid://4i0c3dtjrmqt" path="res://project/scripts/j_body.gd" id="1_3s1so"]
 [ext_resource type="Texture2D" uid="uid://cnc66qebd07co" path="res://project/assets/J-TertrominoB.png" id="2_p2m2q"]
+[ext_resource type="AudioStream" uid="uid://dukegdv8mj87m" path="res://project/assets/music/block_shift_blip_high.wav" id="3_aa8ta"]
 
 [node name="J_body" type="CharacterBody2D"]
 input_pickable = true
@@ -61,5 +62,17 @@ target_position = Vector2(0, -16)
 [node name="RayCastJ" type="RayCast2D" parent="." groups=["shape_raycast"]]
 position = Vector2(16, -16)
 target_position = Vector2(0, -16)
+
+[node name="ClickSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_aa8ta")
+volume_db = -20.0
+
+[node name="MoveSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_aa8ta")
+volume_db = -20.0
+
+[node name="RotateSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_aa8ta")
+volume_db = -20.0
 
 [connection signal="input_event" from="Area2D" to="." method="_on_area_2d_input_event"]
