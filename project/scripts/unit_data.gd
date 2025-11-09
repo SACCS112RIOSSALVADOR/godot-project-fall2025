@@ -38,8 +38,6 @@ func actionsleft():
 		actionable = true
 		remaining_steps = remaining_steps - 1
 		
-
-
 # In another script (e.g., a game manager or character spawner) for later
 func _ready():
 	var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")

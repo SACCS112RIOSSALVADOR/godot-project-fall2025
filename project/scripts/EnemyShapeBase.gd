@@ -3,19 +3,19 @@ extends CharacterBody2D
 const TILE_SIZE := 16 
 
 var sprite_node_pos_tween: Tween 
-var current_rotation := 0.0 
+var current_rotation := 0.0  
 var is_selected := false  
-var raycasts: Array[RayCast2D] = [] 
+var raycasts: Array[RayCast2D] = []  
 var adjacent_enemies: Array = []  # Track adjacent enemy pieces
 
 @onready var shape_sprite: Sprite2D = get_child(1)  
 @onready var area_collission: Area2D = get_child(2)
 @onready var click_sound: AudioStreamPlayer = $ClickSound  
 @onready var move_sound: AudioStreamPlayer = $MoveSound  
-@onready var rotate_sound: AudioStreamPlayer = $RotateSound 
+@onready var rotate_sound: AudioStreamPlayer = $RotateSound  
 
-var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")
-var team: bool 
+var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")  
+var team: bool  
 
 func set_team(flag):
 	team = flag

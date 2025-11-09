@@ -83,6 +83,12 @@ esc={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="player_team"
+2d_physics/layer_2="enemy_team"
+2d_physics/layer_3="walls"
+
 [plugins]
 
 ai_assistant_hub/llm_api="ollama_api"
