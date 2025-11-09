@@ -1,181 +1,151 @@
 extends CharacterBody2D
 
-const TILE_SIZE := 16 
+# =================== Signals / adjacency cache ===================
+signal adjacent_unit_entered(unit: Node, direction: String, is_enemy: bool)
+signal adjacent_unit_exited(unit: Node, direction: String, is_enemy: bool)
 
-var sprite_node_pos_tween: Tween 
-var current_rotation := 0.0 
-var is_selected := false  
-var raycasts: Array[RayCast2D] = [] 
-var adjacent_enemies: Array = []  # Track adjacent enemy pieces
+var _adj_prev_hit: Dictionary = {}   # RayCast2D -> Node
 
-@onready var shape_sprite: Sprite2D = get_child(1)  
-@onready var area_collission: Area2D = get_child(2)
-@onready var click_sound: AudioStreamPlayer = $ClickSound  
-@onready var move_sound: AudioStreamPlayer = $MoveSound  
-@onready var rotate_sound: AudioStreamPlayer = $RotateSound 
 
+# =================== Constants ===================
+const TILE_SIZE := 16  # Size of each grid tile in pixels
+
+
+# =================== Movement & state ===================
+var sprite_node_pos_tween: Tween            # Tween for smooth sprite movement animation
+var current_rotation := 0.0                 # Current rotation angle in degrees
+var is_selected := false                    # Whether this shape is currently selected
+var raycasts: Array[RayCast2D] = []         # Raycasts used for collision detection
+
+
+# =================== Node references ===================
+@onready var shape_sprite: Sprite2D = get_child(1)  # Visual sprite
+@onready var area_collission: Area2D = get_child(2) # Clickable Area2D
+
+# Sound effects
+@onready var click_sound: AudioStreamPlayer = $ClickSound
+@onready var move_sound: AudioStreamPlayer = $MoveSound
+@onready var rotate_sound: AudioStreamPlayer = $RotateSound
+
+
+# =================== Unit data ===================
 var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")
-var team: bool 
+var team: bool   # Which team this shape belongs to
 
-func set_team(flag):
+
+# =================== Team setter ===================
+func set_team(flag: bool) -> void:
 	team = flag
 	if team == true:
 		loaded_data.team = true
-		# Set collision layers for player team
-		set_collision_layer_value(1, true)   # Layer 1: player_team
-		set_collision_layer_value(2, false)
-		# Detect ALL: own team + enemies + walls
-		set_collision_mask_value(1, true)    # Detect player_team
-		set_collision_mask_value(2, true)    # Detect enemy_team
-		set_collision_mask_value(3, true)    # Detect walls
 	else:
 		loaded_data.team = false
-		# Set collision layers for enemy team
-		set_collision_layer_value(1, false)
-		set_collision_layer_value(2, true)   # Layer 2: enemy_team
-		# Detect ALL: own team + enemies + walls
-		set_collision_mask_value(1, true)    # Detect player_team
-		set_collision_mask_value(2, true)    # Detect enemy_team
-		set_collision_mask_value(3, true)    # Detect walls
 	print(team)
 
-func _ready():
+
+# =================== Ready ===================
+func _ready() -> void:
+	# Load and verify unit data
 	if loaded_data:
 		print("Health: " + str(loaded_data.health))
 	else:
 		print("Failed to load character data.")
-	
+
+	# Tint foes
 	if team == false:
 		shape_sprite.modulate = Color(0.528, 0.205, 0.105, 0.945)
-	
-	# Setup raycasts and connect signals
+
+	# Collect all RayCast2D nodes from children (direct and nested)
 	for child in get_children():
 		if child is RayCast2D:
 			raycasts.append(child)
-			_setup_raycast(child)
 		elif child is Node:
 			for sub in child.get_children():
 				if sub is RayCast2D:
 					raycasts.append(sub)
-					_setup_raycast(sub)
-	print("Loaded RayCasts for", name, ":", raycasts.size())
-	
-	# Force raycast update on next frame
-	await get_tree().physics_frame
-	
-	# Check for adjacent enemies on start
-	check_adjacent_enemies()
+	print("Loaded RayCasts for ", name, " : ", str(raycasts.size()))
 
-func _setup_raycast(ray: RayCast2D):
-	"""Configure raycast collision detection"""
-	# Detect ALL: own team + enemies + walls
-	ray.set_collision_mask_value(1, true)   # Detect player_team
-	ray.set_collision_mask_value(2, true)   # Detect enemy_team  
-	ray.set_collision_mask_value(3, true)   # Detect walls
-	
-	ray.enabled = true
-	ray.hit_from_inside = false
+	# Prime adjacency state (no signals on first frame)
+	_adj_update(true)
 
-func check_adjacent_enemies() -> Array:
-	"""Check all raycasts for adjacent enemy pieces"""
-	adjacent_enemies.clear()
-	
-	for ray in raycasts:
-		if ray == null or !ray.enabled:
-			continue
-		
-		ray.force_raycast_update()  # Update raycast immediately
-		
-		if ray.is_colliding():
-			var collider = ray.get_collider()
-			if collider and collider.has_method("get_team"):
-				# Check if it's an enemy
-				if collider.get_team() != team:
-					if not adjacent_enemies.has(collider):
-						adjacent_enemies.append(collider)
-						_on_enemy_detected(collider, ray)
-	
-	return adjacent_enemies
 
-func _on_enemy_detected(enemy, ray: RayCast2D):
-	"""Called when an enemy is detected by a raycast"""
-	print(name, "detected enemy:", enemy.name, "via raycast at", ray.target_position)
-	
-	# Update combat state in loaded_data
-	if loaded_data:
-		loaded_data.in_combat = true
-	
-	# You can emit signals or trigger combat here
-	# For example: emit_signal("enemy_adjacent", enemy)
+# =================== Click handling (with right-click) ===================
+func _on_area_2d_input_event(viewport: Viewport, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		# --- RIGHT CLICK ---
+		if event.button_index == MOUSE_BUTTON_RIGHT:
+			viewport.set_input_as_handled()
+			print("RMB on:", name, " at ", get_global_mouse_position())
+			# Example action on right-click (optional):
+			# perform_rotation()
+			return
 
-func get_team() -> bool:
-	"""Return this piece's team (for other pieces to check)"""
-	return team
+		# --- LEFT CLICK (select / deselect) ---
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if SelectionManager.selected_shape != self:
+				if SelectionManager.selected_shape:
+					SelectionManager.selected_shape.is_selected = false
+				SelectionManager.selected_shape = self
+				is_selected = true
+				print("Selected", name)
+				if click_sound:
+					click_sound.play()
+			else:
+				is_selected = false
+				SelectionManager.selected_shape = null
+				print("Deselected", name)
+				if click_sound:
+					click_sound.play()
 
-func _on_area_2d_input_event(_viewport, event, _shape_idx):
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if SelectionManager.selected_shape != self:
-			if SelectionManager.selected_shape:
-				SelectionManager.selected_shape.is_selected = false
-			SelectionManager.selected_shape = self
-			is_selected = true
-			print("Selected", name)
-			
-			# Check for enemies when selected
-			check_adjacent_enemies()
-			
-			if click_sound:
-				click_sound.play()
-		else:
-			is_selected = false
-			SelectionManager.selected_shape = null
-			print("Deselected", name)
-			if click_sound:
-				click_sound.play()
 
+# =================== Collision queries ===================
 func check_collision(direction: String) -> bool:
 	for ray in raycasts:
 		if ray == null or !ray.enabled:
-			continue 
+			continue
 
-		var global_ray_dir := ray.target_position.rotated(global_rotation)
-		
+		# Ray direction in global coordinates (accounting for rotation)
+		var global_ray_dir: Vector2 = ray.target_position.rotated(global_rotation)
+
 		match direction:
 			"right":
-				if global_ray_dir.x > 0 and ray.is_colliding():
+				if global_ray_dir.x > 0.0 and ray.is_colliding():
 					return true
 			"left":
-				if global_ray_dir.x < 0 and ray.is_colliding():
+				if global_ray_dir.x < 0.0 and ray.is_colliding():
 					return true
 			"up":
-				if global_ray_dir.y < 0 and ray.is_colliding():
+				if global_ray_dir.y < 0.0 and ray.is_colliding():
 					return true
 			"down":
-				if global_ray_dir.y > 0 and ray.is_colliding():
+				if global_ray_dir.y > 0.0 and ray.is_colliding():
 					return true
 	return false
+
 
 func check_all_collisions() -> bool:
 	return check_collision("right") or check_collision("left") or check_collision("up") or check_collision("down")
 
-func perform_rotation():
-	var new_angle := fmod(global_rotation_degrees + 90, 360)
+
+# =================== Rotation ===================
+func perform_rotation() -> void:
+	var new_angle := fmod(global_rotation_degrees + 90.0, 360.0)
 	global_rotation_degrees = new_angle
 	if !check_all_collisions():
 		current_rotation = new_angle
-		print(name, "rotated to", current_rotation)
+		print(name, " rotated to ", str(current_rotation))
 		if rotate_sound:
 			rotate_sound.play()
-		
-		# Check for enemies after rotation
-		check_adjacent_enemies()
 	else:
 		global_rotation_degrees = current_rotation
 
+
+# =================== Per-physics input ===================
 func _physics_process(_delta: float) -> void:
 	if !is_selected:
 		return
 
+	# Block input while tween animates
 	if sprite_node_pos_tween and sprite_node_pos_tween.is_running():
 		return
 
@@ -193,11 +163,17 @@ func _physics_process(_delta: float) -> void:
 	if move_vec != Vector2.ZERO:
 		_move(move_vec)
 
+	# Space = rotate
 	if Input.is_action_just_pressed("space"):
 		perform_rotation()
 
-func _move(direction: Vector2):
-	var new_pos := global_position + direction * TILE_SIZE
+	# After movement/rotation, update adjacency & fire signals
+	_adj_update()
+
+
+# =================== Movement (tweened) ===================
+func _move(direction: Vector2) -> void:
+	var new_pos: Vector2 = global_position + direction * float(TILE_SIZE)
 	global_position = new_pos
 
 	if move_sound:
@@ -210,17 +186,120 @@ func _move(direction: Vector2):
 	sprite_node_pos_tween.set_parallel(true)
 	sprite_node_pos_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	sprite_node_pos_tween.tween_property(shape_sprite, "global_position", new_pos, 0.185).set_trans(Tween.TRANS_SINE)
-	
-	# Check for enemies after moving
-	await sprite_node_pos_tween.finished
-	check_adjacent_enemies()
 
-# Optional: Add a visual indicator for combat state
-func _process(_delta: float) -> void:
-	if adjacent_enemies.size() > 0:
-		# Flash or highlight when adjacent to enemies
-		shape_sprite.modulate.a = 0.8 + sin(Time.get_ticks_msec() * 0.005) * 0.2
-	elif team == false:
-		shape_sprite.modulate = Color(0.528, 0.205, 0.105, 0.945)
+
+
+# =================== Adjacency (script-only) helpers ===================
+# Recomputes adjacency from your existing raycasts array.
+# If 'prime == true', it only caches the state (no signals).
+func _adj_update(prime: bool=false) -> void:
+	var now: Dictionary = {}  # RayCast2D -> Node
+
+	for ray in raycasts:
+		if ray == null or !ray.enabled:
+			continue
+
+		ray.force_raycast_update()
+		if !ray.is_colliding():
+			continue
+
+		# One-tile distance gate so long rays don't trigger far away
+		var origin: Vector2 = ray.to_global(Vector2.ZERO)
+		var hit_p: Vector2 = ray.get_collision_point()
+		if origin.distance_to(hit_p) > float(TILE_SIZE) * 1.1:
+			continue
+
+		var col: Object = ray.get_collider()
+		var unit: Node = _adj_find_unit_root(col)
+		if unit != null and unit != self:
+			now[ray] = unit
+			if !_adj_prev_hit.has(ray) and !prime:
+				var dir: String = _adj_direction_of(ray)
+				emit_signal("adjacent_unit_entered", unit, dir, _adj_is_enemy(unit))
+
+	# Anything present last frame but missing now → exit
+	if !prime:
+		for r in _adj_prev_hit.keys():
+			if !now.has(r):
+				var u: Node = (_adj_prev_hit[r] as Node)
+				if u != null:
+					var d: String = _adj_direction_of(r)
+					emit_signal("adjacent_unit_exited", u, d, _adj_is_enemy(u))
+
+	_adj_prev_hit = now
+
+
+# Direction label ("up/down/left/right") for a given ray, relative to *current* rotation
+func _adj_direction_of(ray: RayCast2D) -> String:
+	var v: Vector2 = ray.target_position.rotated(global_rotation)
+	if abs(v.x) >= abs(v.y):
+		return "right" if v.x >= 0.0 else "left"
 	else:
-		shape_sprite.modulate = Color(1, 1, 1, 1)
+		return "down" if v.y >= 0.0 else "up"
+
+
+# Walk up to find a node that "looks like" one of your units (has loaded_data/team)
+func _adj_find_unit_root(x: Object) -> Node:
+	var n: Node = x as Node
+	while n != null:
+		var has_prop: bool = false
+
+		var ud: Variant = n.get("loaded_data")
+		if ud != null and typeof(ud) != TYPE_NIL:
+			has_prop = true
+
+		if !has_prop:
+			var t: Variant = n.get("team")
+			if t != null and typeof(t) == TYPE_BOOL:
+				has_prop = true
+
+		if has_prop:
+			return n
+		n = n.get_parent()
+	return null
+
+
+# Enemy if team differs. Prefer loaded_data.team; fall back to node.team.
+func _adj_is_enemy(unit: Node) -> bool:
+	var my_team: Variant = _adj_team_of(self)
+	var their_team: Variant = _adj_team_of(unit)
+	if typeof(my_team) != TYPE_BOOL or typeof(their_team) != TYPE_BOOL:
+		return false
+	return bool(my_team) != bool(their_team)
+
+
+func _adj_team_of(node: Node) -> Variant:
+	if node == null:
+		return null
+	var ud: Variant = node.get("loaded_data")
+	if ud != null and typeof(ud) != TYPE_NIL:
+		var obj: Object = ud as Object
+		var t: Variant = obj.get("team")
+		if typeof(t) == TYPE_BOOL:
+			return t
+	var t2: Variant = node.get("team")
+	if typeof(t2) == TYPE_BOOL:
+		return t2
+	return null
+
+
+# Convenience query you can call from anywhere:
+func has_enemy_adjacent(direction: String) -> bool:
+	var dir: String = direction.to_lower()
+	for ray in raycasts:
+		if ray == null or !ray.enabled:
+			continue
+		var d: String = _adj_direction_of(ray)
+		if d != dir:
+			continue
+		ray.force_raycast_update()
+		if ray.is_colliding():
+			var origin: Vector2 = ray.to_global(Vector2.ZERO)
+			var p: Vector2 = ray.get_collision_point()
+			if origin.distance_to(p) <= float(TILE_SIZE) * 1.1:
+				var collider: Object = ray.get_collider()
+				var u: Node = _adj_find_unit_root(collider)
+				if u != null and _adj_is_enemy(u):
+					return true
+	return false
+# =================== end adjacency helpers ===================
