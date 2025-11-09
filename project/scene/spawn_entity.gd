@@ -32,6 +32,8 @@ func _ready() -> void:
 		foe_instance.set_team(false)
 		foe_instance.position = foe_positions[i]
 		add_child(foe_instance)
+		
+		#later pick an instance at random and (bias downward) movemoent. Only attack if in range
 		enemy_child_array.append(foe_instance)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
