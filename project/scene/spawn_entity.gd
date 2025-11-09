@@ -10,6 +10,7 @@ var tetrominos = [
 	preload("res://project/scene/tetrominos/z_tetro.tscn"),
 ]
 
+var enemy_child_array: Array[Node] = []
 var num_entities_on_start = 7
 
 var player_positions = [Vector2(128,272),Vector2(104,216), Vector2(152,216),Vector2(80,256),Vector2(184,264),Vector2(120,248),Vector2(152,248)]
@@ -31,6 +32,7 @@ func _ready() -> void:
 		foe_instance.set_team(false)
 		foe_instance.position = foe_positions[i]
 		add_child(foe_instance)
+		enemy_child_array.append(foe_instance)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
