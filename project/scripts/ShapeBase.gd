@@ -47,7 +47,7 @@ func set_team(flag):
 
 func _ready():
 	if loaded_data:
-		print("Health: " + str(loaded_data.health))
+		loaded_data.health_changed.connect(_on_health_changed)
 	else:
 		print("Failed to load character data.")
 	
@@ -76,6 +76,11 @@ func _ready():
 	# Check for adjacent enemies on start
 	check_adjacent_enemies()
 	_adj_update(true)
+
+func _on_health_changed(old_value, new_value):
+	var attack_panel = get_tree().root.get_node("main/PanelContainer")
+	if attack_panel and attack_panel.visible and attack_panel.get_meta("selected_unit") == self:
+		attack_panel.update_health(new_value)
 
 func _setup_raycast(ray: RayCast2D):
 	"""Configure raycast collision detection"""
@@ -109,12 +114,19 @@ func check_adjacent_enemies() -> Array:
 	return adjacent_enemies
 
 func _on_enemy_detected(enemy, ray: RayCast2D):
-	"""Called when an enemy is detected by a raycast"""
-	print(name, "detected enemy:", enemy.name, "via raycast at", ray.target_position)
+	print(name, "detected enemy:", enemy.name)
 	
-	# Update combat state in loaded_data
 	if loaded_data:
 		loaded_data.in_combat = true
+	
+	# Trigger combat when spacebar is pressed
+	if Input.is_action_just_pressed("ui_accept"):
+		initiate_combat(enemy)
+
+func initiate_combat(enemy):
+	if enemy.loaded_data:
+		enemy.loaded_data.take_damage(loaded_data.strength)
+		print(name, "attacked", enemy.name)
 
 func _on_adjacent_unit_entered(unit: Node, direction: String, is_enemy: bool):
 	"""Friend's signal: Called when a unit becomes adjacent"""
@@ -141,34 +153,46 @@ func get_team() -> bool:
 
 func _on_area_2d_input_event(viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed:
-		# Friend's right-click support
+		# Right-click opens AttackPanel
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			viewport.set_input_as_handled()
-			print("RMB on:", name, "at", get_global_mouse_position())
-			if adjacent_enemies.size() > 0:
-				print("Available enemy targets:", adjacent_enemies.size())
+			var attack_panel = get_tree().root.get_node("main/PanelContainer")
+			if attack_panel:
+				attack_panel.show_for_unit(self)
 			return
-		
-		# Original left-click selection
+
+		# Left-click selects unit or attacks enemy
 		if event.button_index == MOUSE_BUTTON_LEFT:
+			var attack_panel = get_tree().root.get_node("main/PanelContainer")
+
+			# Case: panel has an active attack and this shape is an enemy target
+			if attack_panel and attack_panel.selected_attack != "" and SelectionManager.selected_shape and SelectionManager.selected_shape != self:
+				var attacker = attack_panel.attacker
+				if attacker and attacker != self:
+					var dmg := 0
+					match attack_panel.selected_attack:
+						"light":
+							dmg = attacker.loaded_data.strength
+						"heavy":
+							dmg = attacker.loaded_data.strength * 2
+					loaded_data.take_damage(dmg)
+					print("%s attacked %s for %d damage" % [attacker.name, name, dmg])
+					attack_panel.selected_attack = ""
+					attack_panel.hide()
+				return
+
+			# Normal selection logic
 			if SelectionManager.selected_shape != self:
 				if SelectionManager.selected_shape:
 					SelectionManager.selected_shape.is_selected = false
 				SelectionManager.selected_shape = self
 				is_selected = true
-				print("Selected", name)
-				
-				# Check for enemies when selected
 				check_adjacent_enemies()
-				
-				if click_sound:
-					click_sound.play()
+				if click_sound: click_sound.play()
 			else:
 				is_selected = false
 				SelectionManager.selected_shape = null
-				print("Deselected", name)
-				if click_sound:
-					click_sound.play()
+				if click_sound: click_sound.play()
 
 func check_collision(direction: String) -> bool:
 	for ray in raycasts:
@@ -243,6 +267,11 @@ func _move(direction: Vector2):
 	if move_sound:
 		move_sound.play()
 
+	# Hide the AttackPanel if it’s showing this shape’s info
+	var attack_panel = get_tree().current_scene.get_node_or_null("PanelContainer")
+	if attack_panel and attack_panel.visible and attack_panel.get_meta("selected_unit") == self:
+		attack_panel.hide()
+
 	if sprite_node_pos_tween:
 		sprite_node_pos_tween.kill()
 
@@ -251,7 +280,6 @@ func _move(direction: Vector2):
 	sprite_node_pos_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	sprite_node_pos_tween.tween_property(shape_sprite, "global_position", new_pos, 0.185).set_trans(Tween.TRANS_SINE)
 	
-	# Check for enemies after moving
 	await sprite_node_pos_tween.finished
 	check_adjacent_enemies()
 

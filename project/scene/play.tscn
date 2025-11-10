@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://xyubiujw3nyd"]
+[gd_scene load_steps=28 format=4 uid="uid://xyubiujw3nyd"]
 
 [ext_resource type="Texture2D" uid="uid://0ajk0kctpong" path="res://project/assets/small_tetrominos.png" id="1_oscul"]
 [ext_resource type="Script" uid="uid://cugoym7ghi2sg" path="res://project/scripts/play.gd" id="1_sp4nc"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://b482imgr67jua" path="res://project/scripts/resume_button.gd" id="7_so0f7"]
 [ext_resource type="Script" uid="uid://ccvryi3dp1v1j" path="res://project/scripts/restart_button.gd" id="8_17qu3"]
 [ext_resource type="Script" uid="uid://7nsn1bjnxqit" path="res://project/scripts/menu_button.gd" id="9_83c6f"]
+[ext_resource type="Script" uid="uid://vx8f5461twsf" path="res://project/scene/AttackPanel.gd" id="12_gaoh4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_67hsh"]
 texture = ExtResource("1_oscul")
@@ -70,6 +71,43 @@ shadow_size = 5
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_17qu3"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wc3c0"]
+bg_color = Color(0.6901961, 0.5254902, 1, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hol5s"]
+bg_color = Color(0.4509804, 0.003921569, 0.83137256, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_51p27"]
+bg_color = Color(0.5764706, 0.23137255, 1, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drid6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vtyot"]
+bg_color = Color(0.4509804, 0.003921569, 0.83137256, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lgrye"]
+bg_color = Color(0.5764706, 0.23137255, 1, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
 [node name="main" type="Node2D"]
 script = ExtResource("1_sp4nc")
 
@@ -112,6 +150,7 @@ theme_override_constants/outline_size = 5
 theme_override_fonts/font = ExtResource("7_gaoh4")
 theme_override_font_sizes/font_size = 15
 text = "Esc to Pause"
+metadata/_edit_use_anchors_ = true
 
 [node name="PausePanel" type="Panel" parent="."]
 offset_left = 80.0
@@ -136,6 +175,7 @@ offset_bottom = 43.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 5
+metadata/_edit_use_anchors_ = true
 
 [node name="ResumeButton" type="Button" parent="PausePanel/VBoxContainer"]
 layout_mode = 2
@@ -187,6 +227,74 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_so0f7")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_17qu3")
 text = "Menu"
 script = ExtResource("9_83c6f")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+offset_right = 80.0
+offset_bottom = 47.0
+script = ExtResource("12_gaoh4")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.0
+theme_override_constants/separation = 0
+
+[node name="HealthLabel" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("7_gaoh4")
+theme_override_font_sizes/font_size = 10
+text = "Health:"
+
+[node name="HealthBar" type="ProgressBar" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("6_js78h")
+theme_override_font_sizes/font_size = 10
+show_percentage = false
+
+[node name="LightAttack" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("7_gaoh4")
+theme_override_font_sizes/font_size = 8
+theme_override_styles/normal = SubResource("StyleBoxFlat_wc3c0")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_hol5s")
+theme_override_styles/hover = SubResource("StyleBoxFlat_51p27")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_drid6")
+text = "Light Attack"
+
+[node name="HeavyAttack" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("7_gaoh4")
+theme_override_font_sizes/font_size = 8
+theme_override_styles/normal = SubResource("StyleBoxFlat_wc3c0")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_vtyot")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lgrye")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_drid6")
+text = "Heavy Attack"
 
 [connection signal="pressed" from="PausePanel/VBoxContainer/ResumeButton" to="PausePanel/VBoxContainer/ResumeButton" method="_on_resume_pressed"]
 [connection signal="pressed" from="PausePanel/VBoxContainer/RestartButton" to="PausePanel/VBoxContainer/RestartButton" method="_on_restart_pressed"]
