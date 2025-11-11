@@ -82,6 +82,7 @@ func _on_health_changed(old_value, new_value):
 	if attack_panel and attack_panel.visible and attack_panel.get_meta("selected_unit") == self:
 		attack_panel.update_health(new_value)
 
+
 func _setup_raycast(ray: RayCast2D):
 	"""Configure raycast collision detection"""
 	# Detect ALL: own team + enemies + walls
@@ -113,20 +114,28 @@ func check_adjacent_enemies() -> Array:
 	
 	return adjacent_enemies
 
-func _on_enemy_detected(enemy, ray: RayCast2D):
+func _on_enemy_detected(enemy, _ray: RayCast2D):
 	print(name, "detected enemy:", enemy.name)
-	
 	if loaded_data:
 		loaded_data.in_combat = true
-	
 	# Trigger combat when spacebar is pressed
+	#This should really be changed so that once the UI attack element is selected on enemy, it triggers combat
 	if Input.is_action_just_pressed("ui_accept"):
 		initiate_combat(enemy)
 
 func initiate_combat(enemy):
-	if enemy.loaded_data:
-		enemy.loaded_data.take_damage(loaded_data.strength)
-		print(name, "attacked", enemy.name)
+	if enemy.has_method("take_damage"):
+		enemy.take_damage(loaded_data.strength) 
+		print("Hit: ", enemy.name)
+	loaded_data.in_combat = false
+
+
+func take_damage(amount):
+	loaded_data.health -= amount
+	print("Enemy health: ", loaded_data.health)
+	if loaded_data.health <= 0:
+		self.queue_free() # Remove when health runs out
+
 
 func _on_adjacent_unit_entered(unit: Node, direction: String, is_enemy: bool):
 	"""Friend's signal: Called when a unit becomes adjacent"""
@@ -199,7 +208,7 @@ func check_collision(direction: String) -> bool:
 		if ray == null or !ray.enabled:
 			continue 
 
-		var global_ray_dir := ray.target_position.rotated(global_rotation)
+		var global_ray_dir = ray.target_position.rotated(global_rotation)
 		
 		match direction:
 			"right":

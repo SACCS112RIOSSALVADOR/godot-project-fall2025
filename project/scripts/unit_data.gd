@@ -21,8 +21,14 @@ func take_damage(amount):
 	var old_health = health
 	health -= amount
 	health_changed.emit(old_health, health)
+	kill_signal()
+
+func kill_signal() -> bool:
 	if health <= 0:
 		health_depleted.emit()
+		return true
+	else:
+		return false
 
 func team_assign():
 	if team == true:
