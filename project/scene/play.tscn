@@ -5,13 +5,13 @@
 [ext_resource type="Texture2D" uid="uid://dmuou3bc3dcuu" path="res://project/assets/background2.png" id="2_83c6f"]
 [ext_resource type="Texture2D" uid="uid://b778t1h6fijki" path="res://project/assets/Chess_Board.png" id="3_17qu3"]
 [ext_resource type="Texture2D" uid="uid://c7kix8e21h07r" path="res://project/assets/Chess_BoardB.png" id="4_83c6f"]
-[ext_resource type="Script" uid="uid://bglixrqgi68j3" path="res://project/scene/spawn_entity.gd" id="5_7x04a"]
+[ext_resource type="Script" uid="uid://bglixrqgi68j3" path="res://project/scripts/spawn_entity.gd" id="5_7x04a"]
 [ext_resource type="FontFile" uid="uid://cw2mrc7ocgxm1" path="res://project/assets/font/super_sliced/Super Sliced.ttf" id="6_js78h"]
 [ext_resource type="FontFile" uid="uid://cqckg5odhl8d3" path="res://project/assets/font/super_sliced/Super Sliced Italic.ttf" id="7_gaoh4"]
 [ext_resource type="Script" uid="uid://b482imgr67jua" path="res://project/scripts/resume_button.gd" id="7_so0f7"]
 [ext_resource type="Script" uid="uid://ccvryi3dp1v1j" path="res://project/scripts/restart_button.gd" id="8_17qu3"]
 [ext_resource type="Script" uid="uid://7nsn1bjnxqit" path="res://project/scripts/menu_button.gd" id="9_83c6f"]
-[ext_resource type="Script" uid="uid://vx8f5461twsf" path="res://project/scene/AttackPanel.gd" id="12_gaoh4"]
+[ext_resource type="Script" uid="uid://vx8f5461twsf" path="res://project/scripts/AttackPanel.gd" id="12_gaoh4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_67hsh"]
 texture = ExtResource("1_oscul")

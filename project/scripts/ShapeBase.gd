@@ -6,55 +6,66 @@ signal adjacent_unit_exited(unit: Node, direction: String, is_enemy: bool)
 
 var _adj_prev_hit: Dictionary = {}
 
-const TILE_SIZE := 16 
+const TILE_SIZE := 16
 
-var sprite_node_pos_tween: Tween 
-var current_rotation := 0.0 
-var is_selected := false  
-var raycasts: Array[RayCast2D] = [] 
+var sprite_node_pos_tween: Tween
+var current_rotation := 0.0
+var is_selected := false
+var raycasts: Array[RayCast2D] = []
 var adjacent_enemies: Array = []  # Track adjacent enemy pieces
 
-@onready var shape_sprite: Sprite2D = get_child(1)  
+@onready var shape_sprite: Sprite2D = get_child(1)
 @onready var area_collission: Area2D = get_child(2)
-@onready var click_sound: AudioStreamPlayer = $ClickSound  
-@onready var move_sound: AudioStreamPlayer = $MoveSound  
-@onready var rotate_sound: AudioStreamPlayer = $RotateSound 
+@onready var click_sound: AudioStreamPlayer = $ClickSound
+@onready var move_sound: AudioStreamPlayer = $MoveSound
+@onready var rotate_sound: AudioStreamPlayer = $RotateSound
 
-var loaded_data: UnitData = load("res://project/resources/unitdata_resource.tres")
-var team: bool 
+# NOTE: preload a template resource and duplicate it per-instance in _ready()
+var _unit_template := preload("res://project/resources/unitdata_resource.tres")
+var loaded_data: UnitData = null
+var team: bool
 
 func set_team(flag):
 	team = flag
+	if loaded_data:
+		loaded_data.team = flag
+	# set collision layers / masks
 	if team == true:
-		loaded_data.team = true
-		# Set collision layers for player team
-		set_collision_layer_value(1, true)   # Layer 1: player_team
+		# Player team
+		set_collision_layer_value(1, true)
 		set_collision_layer_value(2, false)
-		# Detect ALL: own team + enemies + walls
-		set_collision_mask_value(1, true)    # Detect player_team
-		set_collision_mask_value(2, true)    # Detect enemy_team
-		set_collision_mask_value(3, true)    # Detect walls
+		set_collision_mask_value(1, true)
+		set_collision_mask_value(2, true)
+		set_collision_mask_value(3, true)
 	else:
-		loaded_data.team = false
-		# Set collision layers for enemy team
+		# Enemy team
 		set_collision_layer_value(1, false)
-		set_collision_layer_value(2, true)   # Layer 2: enemy_team
-		# Detect ALL: own team + enemies + walls
-		set_collision_mask_value(1, true)    # Detect player_team
-		set_collision_mask_value(2, true)    # Detect enemy_team
-		set_collision_mask_value(3, true)    # Detect walls
+		set_collision_layer_value(2, true)
+		set_collision_mask_value(1, true)
+		set_collision_mask_value(2, true)
+		set_collision_mask_value(3, true)
 	print(team)
 
 func _ready():
+	# Duplicate the resource so each instance has its own health/strength etc.
+	if _unit_template:
+		loaded_data = _unit_template.duplicate(true) # deep duplicate
+	else:
+		print("Failed to preload unit template!")
+		return
+
+	# Connect signals AFTER we have a unique loaded_data
 	if loaded_data:
 		loaded_data.health_changed.connect(_on_health_changed)
+		loaded_data.health_depleted.connect(_on_health_depleted)
 	else:
-		print("Failed to load character data.")
-	
+		print("Failed to create UnitData instance.")
+
+	# Visual tinting for enemy team
 	if team == false:
 		shape_sprite.modulate = Color(0.528, 0.205, 0.105, 0.945)
-	
-	# Setup raycasts and connect signals
+
+	# Setup raycasts
 	for child in get_children():
 		if child is RayCast2D:
 			raycasts.append(child)
@@ -65,44 +76,44 @@ func _ready():
 					raycasts.append(sub)
 					_setup_raycast(sub)
 	print("Loaded RayCasts for", name, ":", raycasts.size())
-	
-	# Connect to adjacency signals
+
+	# Connect adjacency signals
 	adjacent_unit_entered.connect(_on_adjacent_unit_entered)
 	adjacent_unit_exited.connect(_on_adjacent_unit_exited)
-	
-	# Force raycast update on next frame
+
+	# Wait one physics frame then prime adjacency
 	await get_tree().physics_frame
-	
-	# Check for adjacent enemies on start
 	check_adjacent_enemies()
 	_adj_update(true)
 
 func _on_health_changed(old_value, new_value):
-	var attack_panel = get_tree().root.get_node("main/PanelContainer")
+	var attack_panel = get_tree().root.get_node_or_null("main/PanelContainer")
 	if attack_panel and attack_panel.visible and attack_panel.get_meta("selected_unit") == self:
 		attack_panel.update_health(new_value)
 
+func _on_health_depleted():
+	# Cleanup when health is gone
+	print(name, "has been destroyed.")
+	# Make sure to hide panel if it's showing this unit
+	var attack_panel = get_tree().root.get_node_or_null("main/PanelContainer")
+	if attack_panel and attack_panel.visible and attack_panel.get_meta("selected_unit") == self:
+		attack_panel.hide()
+	queue_free()
 
 func _setup_raycast(ray: RayCast2D):
-	"""Configure raycast collision detection"""
-	# Detect ALL: own team + enemies + walls
-	ray.set_collision_mask_value(1, true)   # Detect player_team
-	ray.set_collision_mask_value(2, true)   # Detect enemy_team  
-	ray.set_collision_mask_value(3, true)   # Detect walls
-	
+	# Detect both teams + walls
+	ray.set_collision_mask_value(1, true)
+	ray.set_collision_mask_value(2, true)
+	ray.set_collision_mask_value(3, true)
 	ray.enabled = true
 	ray.hit_from_inside = false
 
 func check_adjacent_enemies() -> Array:
-	"""Check all raycasts for adjacent enemy pieces"""
 	adjacent_enemies.clear()
-	
 	for ray in raycasts:
 		if ray == null or !ray.enabled:
 			continue
-		
-		ray.force_raycast_update()  # Update raycast immediately
-		
+		ray.force_raycast_update()
 		if ray.is_colliding():
 			var collider = ray.get_collider()
 			if collider and collider.has_method("get_team"):
@@ -111,83 +122,99 @@ func check_adjacent_enemies() -> Array:
 					if not adjacent_enemies.has(collider):
 						adjacent_enemies.append(collider)
 						_on_enemy_detected(collider, ray)
-	
 	return adjacent_enemies
 
 func _on_enemy_detected(enemy, _ray: RayCast2D):
 	print(name, "detected enemy:", enemy.name)
 	if loaded_data:
 		loaded_data.in_combat = true
-	# Trigger combat when spacebar is pressed
-	#This should really be changed so that once the UI attack element is selected on enemy, it triggers combat
-	if Input.is_action_just_pressed("ui_accept"):
-		initiate_combat(enemy)
 
 func initiate_combat(enemy):
-	if enemy.has_method("take_damage"):
-		enemy.take_damage(loaded_data.strength) 
+	if enemy and enemy.has_method("take_damage"):
+		enemy.take_damage(loaded_data.strength)
 		print("Hit: ", enemy.name)
 	loaded_data.in_combat = false
 
-
+# Use the UnitData's method so signals fire correctly
 func take_damage(amount):
-	loaded_data.health -= amount
-	print("Enemy health: ", loaded_data.health)
-	if loaded_data.health <= 0:
-		self.queue_free() # Remove when health runs out
-
+	if loaded_data:
+		loaded_data.take_damage(amount)
+	else:
+		print("No loaded_data on", name)
 
 func _on_adjacent_unit_entered(unit: Node, direction: String, is_enemy: bool):
-	"""Friend's signal: Called when a unit becomes adjacent"""
 	if is_enemy:
 		if not adjacent_enemies.has(unit):
 			adjacent_enemies.append(unit)
 		print(name, "enemy entered adjacency:", unit.name, "direction:", direction)
-		
 		if loaded_data:
 			loaded_data.in_combat = true
 
 func _on_adjacent_unit_exited(unit: Node, direction: String, is_enemy: bool):
-	"""Friend's signal: Called when a unit leaves adjacency"""
 	if is_enemy:
 		adjacent_enemies.erase(unit)
 		print(name, "enemy exited adjacency:", unit.name, "direction:", direction)
-		
 		if loaded_data and adjacent_enemies.size() == 0:
 			loaded_data.in_combat = false
 
 func get_team() -> bool:
-	"""Return this piece's team (for other pieces to check)"""
 	return team
 
+# --- Input handling ---
 func _on_area_2d_input_event(viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed:
-		# Right-click opens AttackPanel
+		# RIGHT CLICK: only allow player-team shapes to open the attack panel
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			viewport.set_input_as_handled()
-			var attack_panel = get_tree().root.get_node("main/PanelContainer")
+			if team != true:
+				# Only player shapes (team == true) may open the attack UI
+				return
+			# Only open if there's at least one adjacent enemy
+			if check_adjacent_enemies().size() == 0:
+				print("No adjacent enemies — cannot open attack panel.")
+				return
+			var attack_panel = get_tree().root.get_node_or_null("main/PanelContainer")
 			if attack_panel:
 				attack_panel.show_for_unit(self)
 			return
 
-		# Left-click selects unit or attacks enemy
+		# LEFT CLICK: selection or applying an attack (if panel & attack selected)
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			var attack_panel = get_tree().root.get_node("main/PanelContainer")
+			var attack_panel = get_tree().root.get_node_or_null("main/PanelContainer")
 
-			# Case: panel has an active attack and this shape is an enemy target
+			# Case: panel has an active attack, and this shape is the clicked target
 			if attack_panel and attack_panel.selected_attack != "" and SelectionManager.selected_shape and SelectionManager.selected_shape != self:
 				var attacker = attack_panel.attacker
-				if attacker and attacker != self:
-					var dmg := 0
-					match attack_panel.selected_attack:
-						"light":
-							dmg = attacker.loaded_data.strength
-						"heavy":
-							dmg = attacker.loaded_data.strength * 2
-					loaded_data.take_damage(dmg)
-					print("%s attacked %s for %d damage" % [attacker.name, name, dmg])
-					attack_panel.selected_attack = ""
-					attack_panel.hide()
+				# Validate attacker
+				if attacker == null:
+					print("No attacker set on attack panel.")
+					return
+
+				# Prevent friendly fire
+				if attacker.get_team() == get_team():
+					print("Cannot attack ally:", name)
+					return
+
+				# Enforce adjacency: attacker must list this as an adjacent enemy
+				var adjacent_list = attacker.check_adjacent_enemies()
+				if not adjacent_list.has(self):
+					print("Target not adjacent — move closer to attack.")
+					return
+
+				# Compute damage and apply to the clicked (target) instance
+				var dmg := 0
+				match attack_panel.selected_attack:
+					"light":
+						dmg = attacker.loaded_data.strength
+					"heavy":
+						dmg = attacker.loaded_data.strength * 2
+
+				# Use the instance's take_damage so UnitData signals fire and cleanup happens
+				take_damage(dmg)
+				print("%s attacked %s for %d damage" % [attacker.name, name, dmg])
+
+				attack_panel.selected_attack = ""
+				attack_panel.hide()
 				return
 
 			# Normal selection logic
@@ -203,26 +230,21 @@ func _on_area_2d_input_event(viewport, event, _shape_idx):
 				SelectionManager.selected_shape = null
 				if click_sound: click_sound.play()
 
+# --- Collision helpers unchanged except minor clean checks ---
 func check_collision(direction: String) -> bool:
 	for ray in raycasts:
 		if ray == null or !ray.enabled:
-			continue 
-
+			continue
 		var global_ray_dir = ray.target_position.rotated(global_rotation)
-		
 		match direction:
 			"right":
-				if global_ray_dir.x > 0 and ray.is_colliding():
-					return true
+				if global_ray_dir.x > 0 and ray.is_colliding(): return true
 			"left":
-				if global_ray_dir.x < 0 and ray.is_colliding():
-					return true
+				if global_ray_dir.x < 0 and ray.is_colliding(): return true
 			"up":
-				if global_ray_dir.y < 0 and ray.is_colliding():
-					return true
+				if global_ray_dir.y < 0 and ray.is_colliding(): return true
 			"down":
-				if global_ray_dir.y > 0 and ray.is_colliding():
-					return true
+				if global_ray_dir.y > 0 and ray.is_colliding(): return true
 	return false
 
 func check_all_collisions() -> bool:
@@ -236,8 +258,6 @@ func perform_rotation():
 		print(name, "rotated to", current_rotation)
 		if rotate_sound:
 			rotate_sound.play()
-		
-		# Check for enemies after rotation
 		check_adjacent_enemies()
 	else:
 		global_rotation_degrees = current_rotation
@@ -245,7 +265,6 @@ func perform_rotation():
 func _physics_process(_delta: float) -> void:
 	if !is_selected:
 		return
-
 	if sprite_node_pos_tween and sprite_node_pos_tween.is_running():
 		return
 
@@ -265,9 +284,6 @@ func _physics_process(_delta: float) -> void:
 
 	if Input.is_action_just_pressed("space"):
 		perform_rotation()
-	
-	# Friend's adjacency update system
-	_adj_update()
 
 func _move(direction: Vector2):
 	var new_pos := global_position + direction * TILE_SIZE
@@ -288,11 +304,11 @@ func _move(direction: Vector2):
 	sprite_node_pos_tween.set_parallel(true)
 	sprite_node_pos_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	sprite_node_pos_tween.tween_property(shape_sprite, "global_position", new_pos, 0.185).set_trans(Tween.TRANS_SINE)
-	
+
 	await sprite_node_pos_tween.finished
 	check_adjacent_enemies()
 
-# Friend's adjacency detection system
+# Friend's adjacency detection system — made resilient to freed nodes
 func _adj_update(prime: bool = false) -> void:
 	var now: Dictionary = {}
 
@@ -311,19 +327,27 @@ func _adj_update(prime: bool = false) -> void:
 
 		var col: Object = ray.get_collider()
 		var unit: Node = _adj_find_unit_root(col)
-		if unit != null and unit != self:
+		#Skip null or freed units
+		if unit == null or not is_instance_valid(unit):
+			continue
+
+		if unit != self:
 			now[ray] = unit
 			if !_adj_prev_hit.has(ray) and !prime:
 				var dir: String = _adj_direction_of(ray)
 				emit_signal("adjacent_unit_entered", unit, dir, _adj_is_enemy(unit))
 
 	if !prime:
+		# Iterate over previous hits; skip any freed nodes
 		for r in _adj_prev_hit.keys():
-			if !now.has(r):
-				var u: Node = (_adj_prev_hit[r] as Node)
-				if u != null:
+			var prev_unit: Node = (_adj_prev_hit[r] as Node)
+			# If prev_unit is invalid or not in 'now', emit exit
+			if prev_unit == null or not is_instance_valid(prev_unit) or !now.has(r):
+				if prev_unit == null or not is_instance_valid(prev_unit):
+					continue
+				if !now.has(r):
 					var d: String = _adj_direction_of(r)
-					emit_signal("adjacent_unit_exited", u, d, _adj_is_enemy(u))
+					emit_signal("adjacent_unit_exited", prev_unit, d, _adj_is_enemy(prev_unit))
 
 	_adj_prev_hit = now
 
@@ -338,16 +362,13 @@ func _adj_find_unit_root(x: Object) -> Node:
 	var n: Node = x as Node
 	while n != null:
 		var has_prop: bool = false
-
 		var ud: Variant = n.get("loaded_data")
 		if ud != null and typeof(ud) != TYPE_NIL:
 			has_prop = true
-
 		if !has_prop:
 			var t: Variant = n.get("team")
 			if t != null and typeof(t) == TYPE_BOOL:
 				has_prop = true
-
 		if has_prop:
 			return n
 		n = n.get_parent()
@@ -375,7 +396,6 @@ func _adj_team_of(node: Node) -> Variant:
 	return null
 
 func has_enemy_adjacent(direction: String) -> bool:
-	"""Friend's helper: Check if enemy is adjacent in specific direction"""
 	var dir: String = direction.to_lower()
 	for ray in raycasts:
 		if ray == null or !ray.enabled:
@@ -394,10 +414,8 @@ func has_enemy_adjacent(direction: String) -> bool:
 					return true
 	return false
 
-# Optional: Add a visual indicator for combat state
 func _process(_delta: float) -> void:
 	if adjacent_enemies.size() > 0:
-		# Flash or highlight when adjacent to enemies
 		shape_sprite.modulate.a = 0.8 + sin(Time.get_ticks_msec() * 0.005) * 0.2
 	elif team == false:
 		shape_sprite.modulate = Color(0.528, 0.205, 0.105, 0.945)
