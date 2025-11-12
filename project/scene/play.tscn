@@ -229,6 +229,7 @@ text = "Menu"
 script = ExtResource("9_83c6f")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
+visible = false
 offset_right = 80.0
 offset_bottom = 47.0
 script = ExtResource("12_gaoh4")
@@ -295,6 +296,19 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_vtyot")
 theme_override_styles/hover = SubResource("StyleBoxFlat_lgrye")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_drid6")
 text = "Heavy Attack"
+
+[node name="ScoreLabel" type="Label" parent="."]
+offset_left = 224.0
+offset_top = -27.0
+offset_right = 320.0
+offset_bottom = -4.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("6_js78h")
+theme_override_font_sizes/font_size = 15
+text = "Score:"
 
 [connection signal="pressed" from="PausePanel/VBoxContainer/ResumeButton" to="PausePanel/VBoxContainer/ResumeButton" method="_on_resume_pressed"]
 [connection signal="pressed" from="PausePanel/VBoxContainer/RestartButton" to="PausePanel/VBoxContainer/RestartButton" method="_on_restart_pressed"]

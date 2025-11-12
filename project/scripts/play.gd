@@ -15,6 +15,18 @@ func _ready() -> void:
 	if pause_panel:
 		pause_panel.visible = false
 
+	# Initialize score and update the label
+	score = 0
+	var score_label = $ScoreLabel  # adjust this path if your label is nested differently
+	if score_label:
+		score_label.text = "Score: 0"
+
+	# Optionally, unpause the game on load
+	get_tree().paused = false
+	game_running = true
+	is_paused = false
+
+
 func _process(_delta: float) -> void:
 	# Check for pause input
 	if Input.is_action_just_pressed("ui_cancel"):  # ESC key
@@ -57,3 +69,10 @@ func clear_board():
 func check_game_over():
 	if pieces_remaining == 0:
 		game_running = false
+		
+@onready var score_label = $ScoreLabel  # adjust the path if needed
+
+func add_score(amount: int):
+	score += amount
+	if score_label:
+		score_label.text = "Score: %d" % score

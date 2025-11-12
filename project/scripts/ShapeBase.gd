@@ -92,9 +92,13 @@ func _on_health_changed(old_value, new_value):
 		attack_panel.update_health(new_value)
 
 func _on_health_depleted():
-	# Cleanup when health is gone
 	print(name, "has been destroyed.")
-	# Make sure to hide panel if it's showing this unit
+	# Award score if this was an enemy
+	if team == false:
+		var play_node = get_tree().current_scene
+		if play_node and play_node.has_method("add_score"):
+			play_node.add_score(100)
+	# Hide AttackPanel if showing this unit
 	var attack_panel = get_tree().root.get_node_or_null("main/PanelContainer")
 	if attack_panel and attack_panel.visible and attack_panel.get_meta("selected_unit") == self:
 		attack_panel.hide()
