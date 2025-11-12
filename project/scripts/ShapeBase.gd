@@ -25,6 +25,10 @@ var _unit_template := preload("res://project/resources/unitdata_resource.tres")
 var loaded_data: UnitData = null
 var team: bool
 
+#debugging code delete later
+func print_hi():
+	print("hi")
+
 func set_team(flag):
 	team = flag
 	if loaded_data:

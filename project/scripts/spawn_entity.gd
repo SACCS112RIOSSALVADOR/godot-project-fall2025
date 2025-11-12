@@ -14,7 +14,7 @@ var enemy_child_array: Array[Node] = []
 var probablity_array: Array[float] = [0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14]
 var my_dictionary = {}
 
-var random_increase = 0.1 + randf()
+var random_increase = 0.3 + randf()
 
 var num_entities_on_start = 7
 
@@ -40,12 +40,20 @@ func _ready() -> void:
 		
 		#later pick an instance at random and (bias downward) movemoent. Only attack if in range
 		enemy_child_array.append(foe_instance)
+		#enemy_child_array[i].print_hi()
+		if enemy_child_array[i].has_method("print_hi"):
+			print("greetings")
+			enemy_child_array[i].print_hi()
 
 #on enemy turn, do actions. Limited by steps
 func enemy_ai(switch,steps):
-
+	var coll: bool = false
 	if switch == true:
-		while steps != 0 or steps <= 0:
+		while steps > 0:
+			var temp_index = find_smallest_element_index(probablity_array)
+			if coll == true:
+				pass
+			enemy_child_array[temp_index].move_down()
 			for i in range(enemy_child_array.size()):
 				pass
 			pass
@@ -61,7 +69,7 @@ func find_smallest_element_index(arr):
 	
 	var temp_array = []
 	var smallest_value = arr[0]
-	var smallest_index = arr.min()
+	var smallest_index = 0
 	
 	for i in range(7):
 		if arr[i] < smallest_value:

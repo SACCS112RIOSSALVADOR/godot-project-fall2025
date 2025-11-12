@@ -229,7 +229,6 @@ text = "Menu"
 script = ExtResource("9_83c6f")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-visible = false
 offset_right = 80.0
 offset_bottom = 47.0
 script = ExtResource("12_gaoh4")
