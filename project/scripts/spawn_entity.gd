@@ -53,6 +53,17 @@ func enemy_ai(switch,steps):
 			var temp_index = find_smallest_element_index(probablity_array)
 			if coll == true:
 				pass
+			#pesudo code for later implmentation
+			#if check_all_collisions() == true
+			#skip this shape and move on to the next i
+			#else:
+			#if check_collision(right) == false:
+			#	move right
+			#....
+			#
+			#increase i in prabablity array for less chance to choose it
+			#step = step - 1
+			#
 			enemy_child_array[temp_index].move_down()
 			for i in range(enemy_child_array.size()):
 				pass
