@@ -167,31 +167,42 @@ func get_team() -> bool:
 # --- Input handling ---
 func _on_area_2d_input_event(viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed:
-		# RIGHT CLICK: only allow player-team shapes to open the attack panel
+		var play_node := get_tree().current_scene  # NEW
+
+		# --- RIGHT CLICK: open attack panel ---
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			viewport.set_input_as_handled()
+
+			# Only player team + only on player's turn  (NEW)
 			if team != true:
-				# Only player shapes (team == true) may open the attack UI
 				return
-			# Only open if there's at least one adjacent enemy
+			if play_node and play_node.has_method("is_player_turn") and not play_node.is_player_turn():
+				return
+
 			if check_adjacent_enemies().size() == 0:
 				print("No adjacent enemies — cannot open attack panel.")
 				return
+
 			var attack_panel = get_tree().root.get_node_or_null("main/PanelContainer")
 			if attack_panel:
 				attack_panel.show_for_unit(self)
 			return
 
-		# LEFT CLICK: selection or applying an attack (if panel & attack selected)
+		# --- LEFT CLICK: selection or applying an attack ---
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			var attack_panel = get_tree().root.get_node_or_null("main/PanelContainer")
 
 			# Case: panel has an active attack, and this shape is the clicked target
 			if attack_panel and attack_panel.selected_attack != "" and SelectionManager.selected_shape and SelectionManager.selected_shape != self:
 				var attacker = attack_panel.attacker
-				# Validate attacker
 				if attacker == null:
 					print("No attacker set on attack panel.")
+					return
+
+				# Enforce that attacks only happen in player's turn and attacker is player (NEW)
+				if play_node and play_node.has_method("is_player_turn") and not play_node.is_player_turn():
+					return
+				if not attacker.get_team():
 					return
 
 				# Prevent friendly fire
@@ -199,13 +210,12 @@ func _on_area_2d_input_event(viewport, event, _shape_idx):
 					print("Cannot attack ally:", name)
 					return
 
-				# Enforce adjacency: attacker must list this as an adjacent enemy
+				# Enforce adjacency
 				var adjacent_list = attacker.check_adjacent_enemies()
 				if not adjacent_list.has(self):
 					print("Target not adjacent — move closer to attack.")
 					return
 
-				# Compute damage and apply to the clicked (target) instance
 				var dmg := 0
 				match attack_panel.selected_attack:
 					"light":
@@ -213,15 +223,18 @@ func _on_area_2d_input_event(viewport, event, _shape_idx):
 					"heavy":
 						dmg = attacker.loaded_data.strength * 2
 
-				# Use the instance's take_damage so UnitData signals fire and cleanup happens
 				take_damage(dmg)
 				print("%s attacked %s for %d damage" % [attacker.name, name, dmg])
 
 				attack_panel.selected_attack = ""
 				attack_panel.hide()
+
+				# NEW: count this as the player's action for the turn
+				if play_node and play_node.has_method("on_player_attack_performed"):
+					await play_node.on_player_attack_performed()
 				return
 
-			# Normal selection logic
+			# Normal selection logic (unchanged)
 			if SelectionManager.selected_shape != self:
 				if SelectionManager.selected_shape:
 					SelectionManager.selected_shape.is_selected = false
@@ -269,6 +282,17 @@ func perform_rotation():
 func _physics_process(_delta: float) -> void:
 	if !is_selected:
 		return
+
+	# NEW: no manual movement on enemies
+	if team == false:
+		return
+
+	# NEW: respect the turn system
+	var play_node := get_tree().current_scene
+	if play_node and play_node.has_method("can_player_act"):
+		if not play_node.can_player_act():
+			return
+
 	if sprite_node_pos_tween and sprite_node_pos_tween.is_running():
 		return
 
@@ -284,7 +308,11 @@ func _physics_process(_delta: float) -> void:
 		move_vec = Vector2.DOWN
 
 	if move_vec != Vector2.ZERO:
-		_move(move_vec)
+		# NEW: ask the manager to process this move
+		if play_node and play_node.has_method("on_player_move_request"):
+			await play_node.on_player_move_request(self, move_vec)
+		else:
+			_move(move_vec)
 
 	if Input.is_action_just_pressed("space"):
 		perform_rotation()
