@@ -24,6 +24,8 @@ var adjacent_enemies: Array = []  # Track adjacent enemy pieces
 var _unit_template := preload("res://project/resources/unitdata_resource.tres")
 var loaded_data: UnitData = null
 var team: bool
+var currently_adjacent_to_enemy: bool
+var current_turn: bool # true if player's turn, flase if foe's turn
 
 #debugging code delete later
 func print_hi():
@@ -429,3 +431,38 @@ func _process(_delta: float) -> void:
 		shape_sprite.modulate = Color(0.528, 0.205, 0.105, 0.945)
 	else:
 		shape_sprite.modulate = Color(1, 1, 1, 1)
+
+
+#Enemy AI's movement functions below
+###############################################################################################
+
+#in _physics_process(), if it is the foe's turn call this function
+func perform_action(direction: String, rotation_bool: bool) -> bool:
+	#if unit is adjacent to foe: 
+	#then attack the foe with the highest priority (check foe priority with raycasts) and return false
+	if rotation_bool == true:
+		if check_all_collisions() == false:
+			perform_rotation()
+			return true
+	if  check_collision(direction) == false:
+		match direction:
+			"right":
+				_move(Vector2.RIGHT)
+				return true
+			"left":
+				_move(Vector2.LEFT)
+				return true
+			"up":
+				_move(Vector2.UP)
+				return true
+			"down":
+				_move(Vector2.DOWN)
+				return true
+	
+	return false
+	
+func get_current_position():
+	return global_position
+func change_turn_var(turn: bool):
+	current_turn = turn
+	

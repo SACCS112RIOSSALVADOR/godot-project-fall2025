@@ -58,7 +58,7 @@ func enemy_ai(switch,steps):
 			#skip this shape and move on to the next i
 			#else:
 			#if check_collision(right) == false:
-			#	move right
+			#	ai movement function
 			#....
 			#
 			#increase i in prabablity array for less chance to choose it

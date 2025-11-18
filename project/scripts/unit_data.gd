@@ -4,7 +4,7 @@ class_name UnitData extends Resource
 #attributes
 #@export var character_name: String = "empty"
 @export var health: int = 100
-@export var strength: int = 10
+@export var strength: int = 25
 @export var team: bool
 @export var remaining_steps: int = 3
 @export var actionable: bool = true
