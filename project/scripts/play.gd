@@ -238,10 +238,15 @@ func _on_game_over():
 
 	game_running = false
 	is_paused = true
-
 	get_tree().paused = true
 
 	if pause_panel:
 		pause_panel.visible = true
+
+		# Hide the Resume button when the game is over
+		var resume_button := pause_panel.get_node("VBoxContainer/ResumeButton")
+		if resume_button:
+			resume_button.visible = false
+
 	if game_over_label:
 		game_over_label.visible = true
