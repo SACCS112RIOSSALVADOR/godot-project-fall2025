@@ -16,10 +16,13 @@ var enemy_action_taken : bool = false
 
 # Reference to your pause menu panel (adjust the path to match your scene tree)
 @onready var pause_panel = $PausePanel  # Change this to match your actual node path
+@onready var game_over_label = $GameOverLabel   # adjust path if needed
 
 func _ready() -> void:
 	if pause_panel:
 		pause_panel.visible = false
+	if game_over_label:
+		game_over_label.visible = false     # hide when game starts
 
 	score = 0
 	if score_label:
@@ -174,15 +177,16 @@ func _process(_delta: float) -> void:
 		pass
 
 func toggle_pause():
+	if not game_running:
+		return   # can't pause/unpause when game is over
+
 	is_paused = !is_paused
-	
+
 	if is_paused:
-		# Pause the game
 		get_tree().paused = true
 		if pause_panel:
 			pause_panel.visible = true
 	else:
-		# Resume the game
 		get_tree().paused = false
 		if pause_panel:
 			pause_panel.visible = false
@@ -200,13 +204,19 @@ func newgame():
 	get_tree().paused = false
 	if pause_panel:
 		pause_panel.visible = false
+	if game_over_label:
+		game_over_label.visible = false
 
 func clear_board():
 	pass
 	
 func check_game_over():
-	if pieces_remaining == 0:
-		game_running = false
+	# No more player units or no more enemy units => game over
+	var players := _get_alive_units("player_units")
+	var enemies := _get_alive_units("enemy_units")
+
+	if players.is_empty() or enemies.is_empty():
+		_on_game_over()
 		
 @onready var score_label = $ScoreLabel  # adjust the path if needed
 
@@ -214,3 +224,24 @@ func add_score(amount: int):
 	score += amount
 	if score_label:
 		score_label.text = "Score: %d" % score
+
+func _get_alive_units(group_name: String) -> Array[Node2D]:
+	var result: Array[Node2D] = []
+	for n in get_tree().get_nodes_in_group(group_name):
+		if n is Node2D and is_instance_valid(n) and not n.is_queued_for_deletion():
+			result.append(n)
+	return result
+
+func _on_game_over():
+	if not game_running:
+		return  # already handled
+
+	game_running = false
+	is_paused = true
+
+	get_tree().paused = true
+
+	if pause_panel:
+		pause_panel.visible = true
+	if game_over_label:
+		game_over_label.visible = true

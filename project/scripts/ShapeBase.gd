@@ -102,7 +102,13 @@ func _on_health_depleted():
 	var attack_panel = get_tree().root.get_node_or_null("main/PanelContainer")
 	if attack_panel and attack_panel.visible and attack_panel.get_meta("selected_unit") == self:
 		attack_panel.hide()
+	# Mark this unit for deletion	
 	queue_free()
+	
+	# After queuing the free, ask the main scene to check for game over
+	var play_node2 = get_tree().current_scene
+	if play_node2 and play_node2.has_method("check_game_over"):
+		play_node2.check_game_over()
 
 func _setup_raycast(ray: RayCast2D):
 	# Detect both teams + walls
