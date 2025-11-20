@@ -25,7 +25,7 @@ var _unit_template := preload("res://project/resources/unitdata_resource.tres")
 var loaded_data: UnitData = null
 var team: bool
 var currently_adjacent_to_enemy: bool
-var current_turn: bool # true if player's turn, flase if foe's turn
+var current_turn: bool = true # true if player's turn, flase if foe's turn
 
 #debugging code delete later
 func print_hi():
@@ -69,7 +69,7 @@ func _ready():
 
 	# Visual tinting for enemy team
 	if team == false:
-		shape_sprite.modulate = Color(0.528, 0.205, 0.105, 0.945)
+		shape_sprite.modulate = Color(0.6, 0.039, 0.024, 0.945)
 
 	# Setup raycasts
 	for child in get_children():
@@ -240,7 +240,6 @@ func _on_area_2d_input_event(viewport, event, _shape_idx):
 				SelectionManager.selected_shape = null
 				if click_sound: click_sound.play()
 
-# --- Collision helpers unchanged except minor clean checks ---
 func check_collision(direction: String) -> bool:
 	for ray in raycasts:
 		if ray == null or !ray.enabled:
@@ -255,6 +254,7 @@ func check_collision(direction: String) -> bool:
 				if global_ray_dir.y < 0 and ray.is_colliding(): return true
 			"down":
 				if global_ray_dir.y > 0 and ray.is_colliding(): return true
+	# If no collision is detected, return false
 	return false
 
 func check_all_collisions() -> bool:
@@ -273,27 +273,32 @@ func perform_rotation():
 		global_rotation_degrees = current_rotation
 
 func _physics_process(_delta: float) -> void:
-	if !is_selected:
-		return
-	if sprite_node_pos_tween and sprite_node_pos_tween.is_running():
-		return
+	if current_turn ==  true: #player turn
+		
+		if !is_selected:
+			return
+		if sprite_node_pos_tween and sprite_node_pos_tween.is_running():
+			return
 
-	var move_vec := Vector2.ZERO
+		var move_vec := Vector2.ZERO
 
-	if Input.is_action_just_pressed("ui_right") and !check_collision("right"):
-		move_vec = Vector2.RIGHT
-	elif Input.is_action_just_pressed("ui_left") and !check_collision("left"):
-		move_vec = Vector2.LEFT
-	elif Input.is_action_just_pressed("ui_up") and !check_collision("up"):
-		move_vec = Vector2.UP
-	elif Input.is_action_just_pressed("ui_down") and !check_collision("down"):
-		move_vec = Vector2.DOWN
+		if Input.is_action_just_pressed("ui_right") and !check_collision("right"):
+			move_vec = Vector2.RIGHT
+		elif Input.is_action_just_pressed("ui_left") and !check_collision("left"):
+			move_vec = Vector2.LEFT
+		elif Input.is_action_just_pressed("ui_up") and !check_collision("up"):
+			move_vec = Vector2.UP
+		elif Input.is_action_just_pressed("ui_down") and !check_collision("down"):
+			move_vec = Vector2.DOWN
 
-	if move_vec != Vector2.ZERO:
-		_move(move_vec)
+		if move_vec != Vector2.ZERO:
+			_move(move_vec)
 
-	if Input.is_action_just_pressed("space"):
-		perform_rotation()
+		if Input.is_action_just_pressed("space"):
+			perform_rotation()
+	elif current_turn == false: #enemy turn
+		
+		pass
 
 func _move(direction: Vector2):
 	var new_pos := global_position + direction * TILE_SIZE
@@ -428,7 +433,7 @@ func _process(_delta: float) -> void:
 	if adjacent_enemies.size() > 0:
 		shape_sprite.modulate.a = 0.8 + sin(Time.get_ticks_msec() * 0.005) * 0.2
 	elif team == false:
-		shape_sprite.modulate = Color(0.528, 0.205, 0.105, 0.945)
+		shape_sprite.modulate = Color(0.655, 0.208, 0.188, 0.965)
 	else:
 		shape_sprite.modulate = Color(1, 1, 1, 1)
 
@@ -436,7 +441,6 @@ func _process(_delta: float) -> void:
 #Enemy AI's movement functions below
 ###############################################################################################
 
-#in _physics_process(), if it is the foe's turn call this function
 func perform_action(direction: String, rotation_bool: bool) -> bool:
 	#if unit is adjacent to foe: 
 	#then attack the foe with the highest priority (check foe priority with raycasts) and return false
@@ -465,4 +469,3 @@ func get_current_position():
 	return global_position.y
 func change_turn_var(turn: bool):
 	current_turn = turn
-	

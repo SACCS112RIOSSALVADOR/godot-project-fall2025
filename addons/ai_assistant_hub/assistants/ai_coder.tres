@@ -6,7 +6,8 @@
 
 [sub_resource type="Resource" id="Resource_wmu8k"]
 script = ExtResource("2_d7b6o")
-action_prompt = "Edit  this code:
+action_name = "Edit Code"
+action_prompt = "Edit and optimize this code:
 ***gdscript
 {CODE}
 ***"
@@ -19,4 +20,5 @@ script = ExtResource("3_cor7a")
 type_name = "Coder"
 ai_model = "deepseek-coder-v2:latest"
 llm_provider = ExtResource("1_wmu8k")
+ai_description = "You're useful Godot AI assistant"
 quick_prompts = Array[ExtResource("2_d7b6o")]([SubResource("Resource_wmu8k")])
