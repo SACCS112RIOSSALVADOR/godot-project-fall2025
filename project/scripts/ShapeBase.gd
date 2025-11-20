@@ -462,7 +462,7 @@ func perform_action(direction: String, rotation_bool: bool) -> bool:
 	return false
 	
 func get_current_position():
-	return global_position
+	return global_position.y
 func change_turn_var(turn: bool):
 	current_turn = turn
 	

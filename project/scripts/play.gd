@@ -5,6 +5,8 @@ const REWARD : int = 100
 var game_running : bool 
 var team : bool 
 var pieces_remaining : int = 7
+var foes_remaining: int = 7
+var turn : bool #true = player turn, #false = foe's turn
 var is_paused : bool = false
 
 # Reference to your pause menu panel (adjust the path to match your scene tree)
