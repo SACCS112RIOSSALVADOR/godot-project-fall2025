@@ -27,6 +27,9 @@ var team: bool
 var currently_adjacent_to_enemy: bool
 var current_turn: bool = true # true if player's turn, flase if foe's turn
 
+var step = 0 #used to count the actions the shape took
+
+
 #debugging code delete later
 func print_hi():
 	print("hi")
@@ -467,5 +470,9 @@ func perform_action(direction: String, rotation_bool: bool) -> bool:
 	
 func get_current_position():
 	return global_position.y
-func change_turn_var(turn: bool):
-	current_turn = turn
+func change_turn_var():
+	current_turn = not current_turn
+func step_increment(): #use when an action is taken
+	step = step + 1
+func get_steps()-> int:
+	return step

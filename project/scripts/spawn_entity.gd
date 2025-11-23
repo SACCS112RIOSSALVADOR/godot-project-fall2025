@@ -10,6 +10,10 @@ preload("res://project/scene/tetrominos/t_tetro.tscn"),
 preload("res://project/scene/tetrominos/z_tetro.tscn"),
 ]
 
+signal change_turn
+
+var turn : bool #true = player turn, #false = foe's turn
+
 var playerChildArray: Array[Node] = []
 var enemyChildArray: Array[Node] = []
 var probabilityArray: Array[float] = [0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14]
@@ -19,6 +23,7 @@ var randomIncrease = 0.3 + randf()
 var smallRandomIncrease = randf()
 
 var numEntitiesOnStart = 7
+var steps_left = 5
 
 var playerPositions: Array[Vector2] = [
 Vector2(128, 272), Vector2(104, 216), Vector2(152, 216), 
@@ -58,6 +63,11 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float):
+	if turn == true:
+		get_steps_from_array(playerChildArray)
+		change_turn_order(playerChildArray)
+	if turn == false:
+		pass #removeing later
 	pass
 
 # On enemy turn, do actions. Limited by steps
@@ -68,9 +78,9 @@ func enemy_ai(switch: bool, steps: int):
 			check_if_killed(tempIndex)
 
 			var action = ""
-			if enemyChildArray[tempIndex].get_current_position().y > 240:
+			if enemyChildArray[tempIndex].get_current_position() > 240:
 							action = "up"
-			elif enemyChildArray[tempIndex].get_current_position().y < 40:
+			elif enemyChildArray[tempIndex].get_current_position() < 40:
 							action = "down"
 			else:
 				if randi() % 3 == 0:
@@ -87,7 +97,7 @@ func update_probability_array(index: int):
 	probabilityArray[(index - 1) % enemyChildArray.size()] += smallRandomIncrease
 
 func check_if_killed(index: int):
-	if is_instance_valid(enemyChildArray[index]):
+	if not is_instance_valid(enemyChildArray[index]):
 		enemyChildArray.remove_at(index)
 		probabilityArray.remove_at(index)
 
@@ -105,3 +115,29 @@ func find_smallest_element_index(arr: Array[float]) -> int:
 			smallestIndex = i
 
 	return smallestIndex
+
+func get_steps_from_array(arr: Array[Node]):
+	if arr.is_empty():
+		return -1
+	for i in range(len(arr)):
+		arr[i].step_increment()
+		steps_left = arr[i].get_steps()
+	return steps_left
+
+func change_turn_order(arr: Array[Node]):
+	if steps_left <= 0:
+		if arr.is_empty():
+			return -1
+		for i in range(len(arr)):
+			arr[i].change_turn_var()
+			change_turn.emit()
+		steps_left = 5
+	return 
+
+func get_turn(switch: bool):
+	turn = switch
+
+func delayed_action(): #Used to give the AI more antural movemoent
+	print("Action started!")
+	await get_tree().create_timer(1.0).timeout # Pauses for 1 second
+	print("Action resumed after 1 seconds!")

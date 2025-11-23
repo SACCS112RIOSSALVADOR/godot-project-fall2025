@@ -16,7 +16,9 @@ func _ready() -> void:
 	# Make sure pause panel is hidden at start
 	if pause_panel:
 		pause_panel.visible = false
-
+	
+	turn = true
+	
 	# Initialize score and update the label
 	score = 0
 	var score_label = $ScoreLabel  # adjust this path if your label is nested differently
@@ -78,3 +80,4 @@ func add_score(amount: int):
 	score += amount
 	if score_label:
 		score_label.text = "Score: %d" % score
+	
