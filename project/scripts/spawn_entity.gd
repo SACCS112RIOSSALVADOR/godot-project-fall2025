@@ -41,6 +41,7 @@ var randomBoolFromRandi = bool(randi() % 2)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	turn = true
 	randomize()
 	for i in range(numEntitiesOnStart):
 		var tetrominoScene = tetrominos[i]
@@ -67,29 +68,47 @@ func _process(delta: float):
 		get_steps_from_array(playerChildArray)
 		change_turn_order(playerChildArray)
 	if turn == false:
-		pass #removeing later
+		pass #remove later
+		enemy_ai(true, 1)
 	pass
 
 # On enemy turn, do actions. Limited by steps
 func enemy_ai(switch: bool, steps: int):
+	var kill_switch = 4 # if their are X failures in a row. AI forfeits turn
 	if switch == true:
 		while steps > 0:
 			var tempIndex = find_smallest_element_index(probabilityArray)
 			check_if_killed(tempIndex)
-
+			
+			var vetrical_switch: bool = true #true = down, flase = down
 			var action = ""
+			
+			if vetrical_switch == true:
+				action = "down"
+			else:
+				action = "up"
 			if enemyChildArray[tempIndex].get_current_position() > 240:
 							action = "up"
 			elif enemyChildArray[tempIndex].get_current_position() < 40:
 							action = "down"
 			else:
-				if randi() % 3 == 0:
+				if randi() % 2 == 0:
 					action = "left"
 				else:
 					action = "right"
 			if enemyChildArray[tempIndex].perform_action(action, randomBoolFromRandi):
 				steps -= 1
+			else:
+				if action == "down" and vetrical_switch == true:
+					vetrical_switch = false
+					kill_switch -= 1
+				elif action == "up" and vetrical_switch == false:
+					vetrical_switch = true
+					kill_switch -= 1
 			update_probability_array(tempIndex)
+			if kill_switch <= 0:
+				switch = false
+		switch = false
 
 func update_probability_array(index: int):
 	probabilityArray[index] += randomIncrease
@@ -105,23 +124,22 @@ func check_if_killed(index: int):
 func find_smallest_element_index(arr: Array[float]) -> int:
 	if arr.is_empty():
 		return -1
-
+		
 	var smallestValue = arr[0]
 	var smallestIndex = 0
-
+	
 	for i in range(len(arr)):
 		if arr[i] < smallestValue:
 			smallestValue = arr[i]
 			smallestIndex = i
-
+			
 	return smallestIndex
 
 func get_steps_from_array(arr: Array[Node]):
 	if arr.is_empty():
 		return -1
 	for i in range(len(arr)):
-		arr[i].step_increment()
-		steps_left = arr[i].get_steps()
+		steps_left = steps_left - arr[i].get_steps()
 	return steps_left
 
 func change_turn_order(arr: Array[Node]):
@@ -132,12 +150,13 @@ func change_turn_order(arr: Array[Node]):
 			arr[i].change_turn_var()
 			change_turn.emit()
 		steps_left = 5
+		turn = not turn
 	return 
 
 func get_turn(switch: bool):
 	turn = switch
 
-func delayed_action(): #Used to give the AI more antural movemoent
+func delayed_action(): #Used to give the AI more natural movemoent
 	print("Action started!")
-	await get_tree().create_timer(1.0).timeout # Pauses for 1 second
+	await get_tree().create_timer(0.3).timeout # Pauses for 0.3 seconds
 	print("Action resumed after 1 seconds!")

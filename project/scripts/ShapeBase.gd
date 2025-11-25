@@ -470,9 +470,15 @@ func perform_action(direction: String, rotation_bool: bool) -> bool:
 	
 func get_current_position():
 	return global_position.y
+	
 func change_turn_var():
 	current_turn = not current_turn
+	
 func step_increment(): #use when an action is taken
 	step = step + 1
+	
 func get_steps()-> int:
 	return step
+	
+func reset_step():
+	step = 0
