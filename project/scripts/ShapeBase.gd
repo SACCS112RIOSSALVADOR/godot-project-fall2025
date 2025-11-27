@@ -21,13 +21,15 @@ var adjacent_enemies: Array = []  # Track adjacent enemy pieces
 @onready var rotate_sound: AudioStreamPlayer = $RotateSound
 
 # NOTE: preload a template resource and duplicate it per-instance in _ready()
+signal action_performed(shape: Node)
+
 var _unit_template := preload("res://project/resources/unitdata_resource.tres")
 var loaded_data: UnitData = null
 var team: bool
 var currently_adjacent_to_enemy: bool
-var current_turn: bool = true # true if player's turn, flase if foe's turn
-
-var step = 0 #used to count the actions the shape took
+var current_turn: bool = true # true = player's turn, false = foe's turn
+var step: int = 0
+var enemy_ai_cooldown: float = 0.0
 
 
 #debugging code delete later
@@ -86,6 +88,18 @@ func _ready():
 					_setup_raycast(sub)
 	print("Loaded RayCasts for", name, ":", raycasts.size())
 
+	# Put this unit into a generic group so play.gd can find all units if needed
+	add_to_group("units")
+	if team:
+		add_to_group("player_units")
+	else:
+		add_to_group("foe_units")
+
+	# Connect our action_performed signal to play.gd (if we’re in the play scene)
+	var play_node := get_tree().current_scene
+	if play_node and play_node.has_method("_on_unit_action_performed"):
+		action_performed.connect(play_node._on_unit_action_performed)
+
 	# Connect adjacency signals
 	adjacent_unit_entered.connect(_on_adjacent_unit_entered)
 	adjacent_unit_exited.connect(_on_adjacent_unit_exited)
@@ -136,6 +150,22 @@ func check_adjacent_enemies() -> Array:
 						adjacent_enemies.append(collider)
 						_on_enemy_detected(collider, ray)
 	return adjacent_enemies
+
+func has_adjacent_ally() -> bool:
+	# Uses the same raycast setup as check_adjacent_enemies(),
+	# but looks for units on the *same* team instead.
+	for ray in raycasts:
+		if ray == null or !ray.enabled:
+			continue
+		ray.force_raycast_update()
+		if ray.is_colliding():
+			var collider = ray.get_collider()
+			if collider and collider != self and collider.has_method("get_team"):
+				# Same team = ally
+				if collider.get_team() == team:
+					return true
+	return false
+
 
 func _on_enemy_detected(enemy, _ray: RayCast2D):
 	print(name, "detected enemy:", enemy.name)
@@ -209,6 +239,7 @@ func _on_area_2d_input_event(viewport, event, _shape_idx):
 					return
 
 				# Enforce adjacency: attacker must list this as an adjacent enemy
+								# Enforce adjacency: attacker must list this as an adjacent enemy
 				var adjacent_list = attacker.check_adjacent_enemies()
 				if not adjacent_list.has(self):
 					print("Target not adjacent — move closer to attack.")
@@ -222,9 +253,19 @@ func _on_area_2d_input_event(viewport, event, _shape_idx):
 					"heavy":
 						dmg = attacker.loaded_data.strength * 2
 
+				# --- Ally adjacency bonus (player only) ---
+				# If the attacking unit is on the player team and has at least
+				# one adjacent ally, add a flat bonus based on its strength.
+				if attacker.get_team() == true and attacker.has_method("has_adjacent_ally"):
+					if attacker.has_adjacent_ally():
+						var bonus :int= attacker.loaded_data.strength / 2  # 50% extra
+						dmg += bonus
+						print("Bonus damage applied (+%d) due to adjacent ally." % bonus)
+
 				# Use the instance's take_damage so UnitData signals fire and cleanup happens
 				take_damage(dmg)
 				print("%s attacked %s for %d damage" % [attacker.name, name, dmg])
+
 
 				attack_panel.selected_attack = ""
 				attack_panel.hide()
@@ -275,9 +316,12 @@ func perform_rotation():
 	else:
 		global_rotation_degrees = current_rotation
 
-func _physics_process(_delta: float) -> void:
-	if current_turn ==  true: #player turn
-		
+func _physics_process(delta: float) -> void:
+	# -------------------------
+	# Player-controlled units
+	# -------------------------
+	if current_turn and team == true:
+		# Only respond to input if this piece is selected
 		if !is_selected:
 			return
 		if sprite_node_pos_tween and sprite_node_pos_tween.is_running():
@@ -303,9 +347,55 @@ func _physics_process(_delta: float) -> void:
 
 		if Input.is_action_just_pressed("space"):
 			perform_rotation()
-	elif current_turn == false: #enemy turn
-		
-		pass
+
+	# -------------------------
+	# Enemy AI units
+	# -------------------------
+	elif current_turn == false and team == false:
+		_enemy_ai_step(delta)
+
+func _enemy_ai_step(delta: float) -> void:
+	# Don’t act while tweening
+	if sprite_node_pos_tween and sprite_node_pos_tween.is_running():
+		return
+
+	# Cooldown so enemy doesn’t act every single frame
+	enemy_ai_cooldown -= delta
+	if enemy_ai_cooldown > 0.0:
+		return
+
+	# -------------------------
+	# Decide a direction
+	# -------------------------
+	var direction := "down"
+
+	# Prefer going down; if blocked, try other directions
+	if check_collision("down"):
+		if !check_collision("up"):
+			direction = "up"
+		elif !check_collision("left"):
+			direction = "left"
+		elif !check_collision("right"):
+			direction = "right"
+		else:
+			# Completely surrounded: try a rotation in place
+			var rotated := perform_action("down", true)
+			if rotated:
+				step_increment()
+			enemy_ai_cooldown = 0.25
+			return
+
+	# Randomly decide whether to rotate as part of this action
+	var do_rotate := randf() < 0.2
+
+	var did_action := perform_action(direction, do_rotate)
+	if did_action:
+		step_increment()
+
+	# Wait a bit before next AI move
+	enemy_ai_cooldown = 0.25
+
+
 
 func _move(direction: Vector2):
 	var new_pos := global_position + direction * TILE_SIZE
@@ -478,8 +568,11 @@ func get_current_position():
 func change_turn_var():
 	current_turn = not current_turn
 	
-func step_increment(): #use when an action is taken
-	step = step + 1
+func step_increment() -> void:
+	step += 1
+	# Inform the main controller (play.gd) that an action occurred
+	emit_signal("action_performed", self)
+
 	
 func get_steps()-> int:
 	return step
