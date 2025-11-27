@@ -265,7 +265,9 @@ func _on_area_2d_input_event(viewport, event, _shape_idx):
 				# Use the instance's take_damage so UnitData signals fire and cleanup happens
 				take_damage(dmg)
 				print("%s attacked %s for %d damage" % [attacker.name, name, dmg])
-
+# Consumes one action for the attacker’s team
+				if attacker and attacker.has_method("step_increment"):
+					attacker.step_increment()
 
 				attack_panel.selected_attack = ""
 				attack_panel.hide()
@@ -304,17 +306,25 @@ func check_collision(direction: String) -> bool:
 func check_all_collisions() -> bool:
 	return check_collision("right") or check_collision("left") or check_collision("up") or check_collision("down")
 
-func perform_rotation():
-	var new_angle := fmod(global_rotation_degrees + 90, 360)
+func perform_rotation() -> bool:
+	var old_angle := global_rotation_degrees
+	var new_angle := current_rotation + 90.0
+	new_angle = fmod(new_angle, 360.0)
+
 	global_rotation_degrees = new_angle
-	if !check_all_collisions():
-		current_rotation = new_angle
-		print(name, "rotated to", current_rotation)
-		if rotate_sound:
-			rotate_sound.play()
-		check_adjacent_enemies()
-	else:
-		global_rotation_degrees = current_rotation
+
+	# If colliding after rotation, revert
+	if check_all_collisions():
+		global_rotation_degrees = old_angle
+		return false
+
+	# Commit rotation
+	current_rotation = new_angle
+	if has_node("rotate_sound"):
+		$rotate_sound.play()
+	_adj_update()
+	return true
+
 
 func _physics_process(delta: float) -> void:
 	# -------------------------
@@ -345,14 +355,17 @@ func _physics_process(delta: float) -> void:
 		if move_vec != Vector2.ZERO:
 			_move(move_vec)
 
+		# Rotation is also a valid action if it succeeds
 		if Input.is_action_just_pressed("space"):
-			perform_rotation()
+			if perform_rotation():
+				step_increment()
 
 	# -------------------------
 	# Enemy AI units
 	# -------------------------
 	elif current_turn == false and team == false:
 		_enemy_ai_step(delta)
+
 
 func _enemy_ai_step(delta: float) -> void:
 	# Don’t act while tweening
