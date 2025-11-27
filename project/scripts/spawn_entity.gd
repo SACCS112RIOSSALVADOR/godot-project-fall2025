@@ -63,14 +63,12 @@ func _ready():
 			enemyChildArray[i].print_hi()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float):
+func _physics_process(delta: float):
 	if turn == true:
 		get_steps_from_array(playerChildArray)
 		change_turn_order(playerChildArray)
-	if turn == false:
-		pass #remove later
-		enemy_ai(true, 1)
-	pass
+	elif turn == false:
+		enemy_ai(true, 3)
 
 # On enemy turn, do actions. Limited by steps
 func enemy_ai(switch: bool, steps: int):
@@ -97,18 +95,20 @@ func enemy_ai(switch: bool, steps: int):
 				else:
 					action = "right"
 			if enemyChildArray[tempIndex].perform_action(action, randomBoolFromRandi):
-				steps -= 1
+				steps = steps - 1
 			else:
 				if action == "down" and vetrical_switch == true:
 					vetrical_switch = false
-					kill_switch -= 1
+					kill_switch = kill_switch - 1
 				elif action == "up" and vetrical_switch == false:
 					vetrical_switch = true
-					kill_switch -= 1
+					kill_switch = kill_switch - 1
 			update_probability_array(tempIndex)
 			if kill_switch <= 0:
 				switch = false
+			delayed_action()
 		switch = false
+		change_to_player_turn(playerChildArray)
 
 func update_probability_array(index: int):
 	probabilityArray[index] += randomIncrease
@@ -149,14 +149,28 @@ func change_turn_order(arr: Array[Node]):
 		for i in range(len(arr)):
 			arr[i].change_turn_var()
 			change_turn.emit()
+			arr[i].reset_step()
 		steps_left = 5
 		turn = not turn
 	return 
 
+func change_to_player_turn(arr: Array[Node]):
+	if arr.is_empty():
+		return -1
+	for i in range(len(arr)):
+		arr[i].change_turn_var()
+		change_turn.emit()
+		arr[i].reset_step()
+	steps_left = 5
+	turn = not turn
+	return
+
 func get_turn(switch: bool):
 	turn = switch
 
+
+
 func delayed_action(): #Used to give the AI more natural movemoent
 	print("Action started!")
-	await get_tree().create_timer(0.3).timeout # Pauses for 0.3 seconds
+	await get_tree().create_timer(1).timeout # Pauses for x  seconds
 	print("Action resumed after 1 seconds!")

@@ -287,12 +287,16 @@ func _physics_process(_delta: float) -> void:
 
 		if Input.is_action_just_pressed("ui_right") and !check_collision("right"):
 			move_vec = Vector2.RIGHT
+			step_increment()
 		elif Input.is_action_just_pressed("ui_left") and !check_collision("left"):
 			move_vec = Vector2.LEFT
+			step_increment()
 		elif Input.is_action_just_pressed("ui_up") and !check_collision("up"):
 			move_vec = Vector2.UP
+			step_increment()
 		elif Input.is_action_just_pressed("ui_down") and !check_collision("down"):
 			move_vec = Vector2.DOWN
+			step_increment()
 
 		if move_vec != Vector2.ZERO:
 			_move(move_vec)
