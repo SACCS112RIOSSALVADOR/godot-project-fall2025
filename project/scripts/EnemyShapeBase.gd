@@ -1,9 +1,5 @@
-
 func _ready():
 	pass
-
-
-
 
 # --- Collision helpers unchanged except minor clean checks ---
 #func check_collision(direction: String) -> bool:

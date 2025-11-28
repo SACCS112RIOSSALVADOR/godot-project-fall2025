@@ -14,6 +14,10 @@ var is_paused : bool = false
 @export var actions_per_turn_player: int = 4
 @export var actions_per_turn_foe: int = 4
 
+# reference game Varialbes $GameOverLabel & $PausePanel/VBoxContainer/ResumeButton
+@onready var game_over_label: Label = $GameOverLabel
+@onready var resume_button: Button = $PausePanel/VBoxContainer/ResumeButton
+
 var player_actions_left: int = 0
 var foe_actions_left: int = 0
 var player_turn: bool = true  # true = player turn, false = foe turn
@@ -56,6 +60,14 @@ func _ready() -> void:
 	if pause_panel:
 		pause_panel.visible = false
 	
+	# Hide GameOverLabel at start
+	if game_over_label:
+		game_over_label.visible = false
+
+	# ResumeButton should be visible during normal play
+	if resume_button:
+		resume_button.visible = true
+	
 	turn = true
 	
 	# Initialize score and update the label
@@ -69,34 +81,51 @@ func _ready() -> void:
 	game_running = true
 	is_paused = false
 
-
 func _process(_delta: float) -> void:
-	# Check for pause input
-	if Input.is_action_just_pressed("ui_cancel"):  # ESC key
+	# Pause via ESC
+	if Input.is_action_just_pressed("ui_cancel"):
 		toggle_pause()
-	
+
 	if game_running and !is_paused:
-		pass
+		# Check if there are no more enemies
+		var foes = get_tree().get_nodes_in_group("foe_units")
+		if foes.is_empty():
+			show_game_over()
 
 func toggle_pause():
+# Do not allow pausing/unpausing after game over
+	if !game_running:
+		return
+
 	is_paused = !is_paused
-	
-	if is_paused:
-		# Pause the game
-		get_tree().paused = true
-		if pause_panel:
-			pause_panel.visible = true
-	else:
-		# Resume the game
-		get_tree().paused = false
-		if pause_panel:
-			pause_panel.visible = false
+
+	get_tree().paused = is_paused
+
+	if pause_panel:
+		pause_panel.visible = is_paused
+
+	# In normal pause, Resume is visible, Game Over label is hidden
+	if resume_button:
+		resume_button.visible = true
+
+	if game_over_label:
+		game_over_label.visible = false
 
 func resume_game():
+	# Can't resume if the game is over
+	if !game_running:
+		return
+
 	is_paused = false
 	get_tree().paused = false
+
 	if pause_panel:
 		pause_panel.visible = false
+
+	# GameOverLabel should already be hidden in normal flow,
+	# but you can force it off to be safe:
+	if game_over_label:
+		game_over_label.visible = false
 
 func newgame():
 	_start_player_turn()
@@ -146,3 +175,23 @@ func _on_unit_action_performed(shape: Node) -> void:
 		print("Foe actions left: ", foe_actions_left)
 		if foe_actions_left <= 0:
 			_end_turn()
+
+# show game over function
+func show_game_over() -> void:
+	# Stop the game logic
+	game_running = false
+	is_paused = true
+
+	# Pause the scene tree
+	get_tree().paused = true
+
+	# Show the pause panel and the Game Over label
+	if pause_panel:
+		pause_panel.visible = true
+
+	if game_over_label:
+		game_over_label.visible = true
+
+	# Hide the Resume button during Game Over
+	if resume_button:
+		resume_button.visible = false
