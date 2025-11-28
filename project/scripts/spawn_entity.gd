@@ -63,62 +63,77 @@ func _ready():
 			enemyChildArray[i].print_hi()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _physics_process(delta: float):
-	if turn == true:
-		get_steps_from_array(playerChildArray)
-		change_turn_order(playerChildArray)
-	elif turn == false:
-		enemy_ai(true, 3)
+func _physics_process(delta: float) -> void:
+	# Turn order & AI are now handled in play.gd + ShapeBase.gd
+	pass
+
 
 # On enemy turn, do actions. Limited by steps
-func enemy_ai(switch: bool, steps: int):
-	var kill_switch = 4 # if their are X failures in a row. AI forfeits turn
+func enemy_ai(switch: bool, steps: int) -> void:
+	var kill_switch = 4 # if there are X failures in a row. AI forfeits turn
 	if switch == true:
 		while steps > 0:
-			var tempIndex = find_smallest_element_index(probabilityArray)
+			# If no enemies left, stop AI
+			if enemyChildArray.is_empty():
+				break
+
+			var tempIndex := find_smallest_element_index(probabilityArray)
+
+			# If probabilityArray is empty, or index invalid, end AI safely
+			if tempIndex < 0 or tempIndex >= enemyChildArray.size():
+				break
+
+			# Remove dead enemies and keep arrays in sync
 			check_if_killed(tempIndex)
-			
-			var vetrical_switch: bool = true #true = down, flase = down
-			var action = ""
-			
+
+			# After removal, arrays might have shrunk; check again
+			if enemyChildArray.is_empty():
+				break
+			if tempIndex >= enemyChildArray.size():
+				tempIndex = enemyChildArray.size() - 1
+
+			var vetrical_switch: bool = true # true = down, false = up
+			var action := ""
+
 			if vetrical_switch == true:
 				action = "down"
 			else:
 				action = "up"
+
 			if enemyChildArray[tempIndex].get_current_position() > 240:
-							action = "up"
+				action = "up"
 			elif enemyChildArray[tempIndex].get_current_position() < 40:
-							action = "down"
+				action = "down"
 			else:
 				if randi() % 2 == 0:
 					action = "left"
 				else:
 					action = "right"
-			if enemyChildArray[tempIndex].perform_action(action, randomBoolFromRandi):
-				steps = steps - 1
-			else:
-				if action == "down" and vetrical_switch == true:
-					vetrical_switch = false
-					kill_switch = kill_switch - 1
-				elif action == "up" and vetrical_switch == false:
-					vetrical_switch = true
-					kill_switch = kill_switch - 1
-			update_probability_array(tempIndex)
-			if kill_switch <= 0:
-				switch = false
-			delayed_action()
+
+			# ... keep the rest of your existing logic here:
+			# if enemyChildArray[tempIndex].perform_action(...): steps -= 1
+			# else: adjust vetrical_switch, kill_switch, etc.
+			# update_probability_array(tempIndex)
+			# if kill_switch <= 0: switch = false
+			# delayed_action()
 		switch = false
 		change_to_player_turn(playerChildArray)
+
 
 func update_probability_array(index: int):
 	probabilityArray[index] += randomIncrease
 	probabilityArray[(index + 1) % enemyChildArray.size()] += smallRandomIncrease
 	probabilityArray[(index - 1) % enemyChildArray.size()] += smallRandomIncrease
 
-func check_if_killed(index: int):
+func check_if_killed(index: int) -> void:
+	# 防止 index 越界 (negative or >= size)
+	if index < 0 or index >= enemyChildArray.size():
+		return
+
 	if not is_instance_valid(enemyChildArray[index]):
 		enemyChildArray.remove_at(index)
 		probabilityArray.remove_at(index)
+
 
 # Bias selection of an index
 func find_smallest_element_index(arr: Array[float]) -> int:

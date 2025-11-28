@@ -434,9 +434,11 @@ func _move(direction: Vector2):
 	check_adjacent_enemies()
 
 # Friend's adjacency detection system — made resilient to freed nodes
+# Friend's adjacency detection system — safe around freed nodes
 func _adj_update(prime: bool = false) -> void:
 	var now: Dictionary = {}
 
+	# --- Scan all raycasts for current hits ---
 	for ray in raycasts:
 		if ray == null or !ray.enabled:
 			continue
@@ -450,31 +452,61 @@ func _adj_update(prime: bool = false) -> void:
 		if origin.distance_to(hit_p) > float(TILE_SIZE) * 1.1:
 			continue
 
-		var col: Object = ray.get_collider()
+		var col = ray.get_collider()
 		var unit: Node = _adj_find_unit_root(col)
-		#Skip null or freed units
-		if unit == null or not is_instance_valid(unit):
+
+		# skip null / freed / self
+		if unit == null or !is_instance_valid(unit) or unit == self:
 			continue
 
-		if unit != self:
-			now[ray] = unit
-			if !_adj_prev_hit.has(ray) and !prime:
-				var dir: String = _adj_direction_of(ray)
-				emit_signal("adjacent_unit_entered", unit, dir, _adj_is_enemy(unit))
+		# remember current hit for this ray
+		now[ray] = unit
+
+		# if this ray was not hitting anyone last time (and this isn’t the prime pass),
+		# emit "entered"
+		if !_adj_prev_hit.has(ray) and !prime:
+			var dir := _adj_direction_of(ray)
+			emit_signal("adjacent_unit_entered", unit, dir, _adj_is_enemy(unit))
+
+	# --- Compare with previous hits to find exits ---
+	if !prime:
+		for r in _adj_prev_hit.keys():
+			var prev_val = _adj_prev_hit[r]  # untyped on purpose (Variant)
+
+			# if value is null or freed, just drop it
+			if prev_val == null or !is_instance_valid(prev_val):
+				continue
+
+			var prev_unit: Node = prev_val
+			# if this ray no longer hits the same unit, emit "exited"
+			if !now.has(r):
+				var d := _adj_direction_of(r)
+				emit_signal("adjacent_unit_exited", prev_unit, d, _adj_is_enemy(prev_unit))
+
+	# store the set of current hits for the next frame
+	_adj_prev_hit = now
+
+
 
 	if !prime:
-		# Iterate over previous hits; skip any freed nodes
+		# Iterate over previous hits; skip any freed nodes safely
 		for r in _adj_prev_hit.keys():
-			var prev_unit: Node = (_adj_prev_hit[r] as Node)
-			# If prev_unit is invalid or not in 'now', emit exit
-			if prev_unit == null or not is_instance_valid(prev_unit) or !now.has(r):
-				if prev_unit == null or not is_instance_valid(prev_unit):
-					continue
-				if !now.has(r):
-					var d: String = _adj_direction_of(r)
-					emit_signal("adjacent_unit_exited", prev_unit, d, _adj_is_enemy(prev_unit))
+			var prev_val :Object= _adj_prev_hit[r]
+			# If the stored value is null or already freed, skip it
+			if prev_val == null or !is_instance_valid(prev_val):
+				continue
 
+			var prev_unit := prev_val as Node
+			if prev_unit == null:
+				continue
+
+			# If this ray no longer hits the same unit, emit 'exited'
+			if !now.has(r):
+				var d: String = _adj_direction_of(r)
+				emit_signal("adjacent_unit_exited", prev_unit, d, _adj_is_enemy(prev_unit))
 	_adj_prev_hit = now
+
+
 
 func _adj_direction_of(ray: RayCast2D) -> String:
 	var v: Vector2 = ray.target_position.rotated(global_rotation)
