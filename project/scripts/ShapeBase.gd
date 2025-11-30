@@ -114,6 +114,12 @@ func _on_health_changed(old_value, new_value):
 	if attack_panel and attack_panel.visible and attack_panel.get_meta("selected_unit") == self:
 		attack_panel.update_health(new_value)
 
+"""
+---------------------------------------------------------
+Requirement 5 – Score rewards when opponents are defeated
+---------------------------------------------------------
+"""
+
 func _on_health_depleted():
 	print(name, "has been destroyed.")
 	# Award score if this was an enemy
@@ -150,6 +156,12 @@ func check_adjacent_enemies() -> Array:
 						adjacent_enemies.append(collider)
 						_on_enemy_detected(collider, ray)
 	return adjacent_enemies
+	
+"""
+-------------------------------------------------
+Requirement 4 – Group movement of adjacent shapes
+-------------------------------------------------
+"""
 
 func has_adjacent_ally() -> bool:
 	# Uses the same raycast setup as check_adjacent_enemies(),
@@ -165,7 +177,6 @@ func has_adjacent_ally() -> bool:
 				if collider.get_team() == team:
 					return true
 	return false
-
 
 func _on_enemy_detected(enemy, _ray: RayCast2D):
 	print(name, "detected enemy:", enemy.name)
@@ -202,6 +213,12 @@ func _on_adjacent_unit_exited(unit: Node, direction: String, is_enemy: bool):
 
 func get_team() -> bool:
 	return team
+
+"""
+---------------------------------------
+Requirement 3 – Combat mode & attacking
+---------------------------------------
+"""
 
 # --- Input handling ---
 func _on_area_2d_input_event(viewport, event, _shape_idx):
@@ -325,6 +342,11 @@ func perform_rotation() -> bool:
 	_adj_update()
 	return true
 
+"""
+-------------------------------------------------------------
+Requirement 2 – Move selected shape with WASD / movement keys
+-------------------------------------------------------------
+"""
 
 func _physics_process(delta: float) -> void:
 	# -------------------------

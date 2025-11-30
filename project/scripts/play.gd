@@ -22,6 +22,12 @@ var player_actions_left: int = 0
 var foe_actions_left: int = 0
 var player_turn: bool = true  # true = player turn, false = foe turn
 
+"""
+---------------------------------------------------------
+Requirement 6 – AI controls opposing shapes on their turn
+---------------------------------------------------------
+"""
+
 func _start_player_turn() -> void:
 	player_turn = true
 	player_actions_left = actions_per_turn_player
@@ -53,6 +59,12 @@ func _end_turn() -> void:
 	else:
 		_start_player_turn()
 
+"""
+------------------------------------------
+Requirement 1 – Start game & display board
+------------------------------------------
+"""
+
 func _ready() -> void:
 	# your existing setup...
 	_start_player_turn()
@@ -80,6 +92,12 @@ func _ready() -> void:
 	get_tree().paused = false
 	game_running = true
 	is_paused = false
+
+"""
+-----------------------------------
+Requirement 7/8 – Pause / resume game
+-----------------------------------
+"""
 
 func _process(_delta: float) -> void:
 	# Pause via ESC
@@ -175,6 +193,12 @@ func _on_unit_action_performed(shape: Node) -> void:
 		print("Foe actions left: ", foe_actions_left)
 		if foe_actions_left <= 0:
 			_end_turn()
+
+"""
+--------------------------------------------------------
+Requirement 8 – Game over when enemy shapes are all dead
+--------------------------------------------------------
+"""
 
 # show game over function
 func show_game_over() -> void:
