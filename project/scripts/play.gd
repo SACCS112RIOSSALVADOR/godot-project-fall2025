@@ -8,6 +8,7 @@ var pieces_remaining : int = 7
 var foes_remaining: int = 7
 var turn : bool #true = player turn, #false = foe's turn
 var is_paused : bool = false
+var turns_left = 25
 
 # Reference to your pause menu panel (adjust the path to match your scene tree)
 @onready var pause_panel = $PausePanel  # Change this to match your actual node path
@@ -18,9 +19,12 @@ var is_paused : bool = false
 @onready var game_over_label: Label = $GameOverLabel
 @onready var resume_button: Button = $PausePanel/VBoxContainer/ResumeButton
 
+@onready var turn_label = $TurnLabel
+
 var player_actions_left: int = 0
 var foe_actions_left: int = 0
 var player_turn: bool = true  # true = player turn, false = foe turn
+
 
 """
 ---------------------------------------------------------
@@ -36,6 +40,9 @@ func _start_player_turn() -> void:
 	for u in get_tree().get_nodes_in_group("units"):
 		if u and is_instance_valid(u):
 			u.current_turn = true
+	
+	print("=== Turns Left ===")
+	print("Turns left: ", turns_left)
 
 	print("=== Player Turn ===")
 	print("Player actions left: ", player_actions_left)
@@ -58,6 +65,7 @@ func _end_turn() -> void:
 		_start_foe_turn()
 	else:
 		_start_player_turn()
+		turns_left = turns_left - 1
 
 """
 ------------------------------------------
@@ -67,6 +75,7 @@ Requirement 1 – Start game & display board
 
 func _ready() -> void:
 	# your existing setup...
+	turns_left = GlobalData.turn_limit
 	_start_player_turn()
 	# Make sure pause panel is hidden at start
 	if pause_panel:
@@ -83,10 +92,10 @@ func _ready() -> void:
 	turn = true
 	
 	# Initialize score and update the label
-	score = 0
+	score = GlobalData.player_score
 	var score_label = $ScoreLabel  # adjust this path if your label is nested differently
 	if score_label:
-		score_label.text = "Score: 0"
+		score_label.text = "Score: "
 
 	# Optionally, unpause the game on load
 	get_tree().paused = false
@@ -108,7 +117,13 @@ func _process(_delta: float) -> void:
 		# Check if there are no more enemies
 		var foes = get_tree().get_nodes_in_group("foe_units")
 		if foes.is_empty():
+			GlobalData.update_score(score)
+			GlobalData.nextlevel()
 			show_game_over()
+		if turns_left <= 0:
+			GlobalData.reset()
+			show_game_over()
+	turn_label.text = "Turns Left: " + str(turns_left)
 
 func toggle_pause():
 # Do not allow pausing/unpausing after game over
@@ -167,7 +182,10 @@ func add_score(amount: int):
 	score += amount
 	if score_label:
 		score_label.text = "Score: %d" % score
-	
+
+
+
+
 func _on_unit_action_performed(shape: Node) -> void:
 	# Defensive: shape might already be freed
 	if !shape or !is_instance_valid(shape):
@@ -219,3 +237,12 @@ func show_game_over() -> void:
 	# Hide the Resume button during Game Over
 	if resume_button:
 		resume_button.visible = false
+		
+
+func show_victory() -> void:
+	# Stop the game logic
+	game_running = false
+	is_paused = true
+	
+	#get victory scene similar to paused
+	
