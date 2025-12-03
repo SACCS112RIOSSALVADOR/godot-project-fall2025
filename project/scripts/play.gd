@@ -20,6 +20,7 @@ var turns_left = 25
 @onready var game_over_label: Label = $GameOverLabel
 @onready var resume_button: Button = $PausePanel/VBoxContainer/ResumeButton
 
+@onready var score_label = $ScoreLabel  # adjust the path if needed
 @onready var turn_label = $TurnLabel
 
 var player_actions_left: int = 0
@@ -90,9 +91,9 @@ func _ready() -> void:
 	
 	# Initialize score and update the label
 	score = GlobalData.player_score
-	var score_label = $ScoreLabel  # adjust this path if your label is nested differently
+
 	if score_label:
-		score_label.text = "Score: "
+		score_label.text = "Score: " +str(GlobalData.player_score)
 
 	# Optionally, unpause the game on load
 	get_tree().paused = false
@@ -183,7 +184,6 @@ func check_game_over():
 	if pieces_remaining == 0:
 		game_running = false
 		
-@onready var score_label = $ScoreLabel  # adjust the path if needed
 
 # Update the player's total score and refresh the onscreen display.
 func add_score(amount: int):
