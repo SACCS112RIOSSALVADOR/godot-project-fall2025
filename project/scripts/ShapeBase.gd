@@ -207,6 +207,13 @@ func _on_enemy_detected(enemy, _ray: RayCast2D):
 	if loaded_data:
 		loaded_data.in_combat = true
 
+"""
+---------------------------------------
+Requirement 3 – Combat mode & attacking
+func initiate_combat(enemy) & take_damage()
+---------------------------------------
+"""
+
 # Combat function
 func initiate_combat(enemy):
 	# The enemy must support "take_damage" for combat to work.
@@ -249,13 +256,6 @@ func _on_adjacent_unit_exited(unit: Node, direction: String, is_enemy: bool):
 
 func get_team() -> bool:
 	return team
-
-"""
----------------------------------------
-Requirement 3 – Combat mode & attacking
-_on_area_2d_input_event() & take_damage()
----------------------------------------
-"""
 
 # --- Input handling ---
 func _on_area_2d_input_event(viewport, event, _shape_idx):

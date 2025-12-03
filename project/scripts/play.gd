@@ -69,12 +69,6 @@ func _end_turn() -> void:
 		_start_player_turn()
 		turns_left = turns_left - 1
 
-"""
-------------------------------------------
-Requirement 1 – Start game & display board
-_ready()
-------------------------------------------
-"""
 # Initialize the level when the scene loads:
 func _ready() -> void:
 	# your existing setup...

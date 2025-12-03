@@ -4,6 +4,13 @@ extends Control
 @onready var main_menu_buttons: VBoxContainer = $main_menu_buttons
 @onready var settings_panel: Panel = $settings_panel
 
+"""
+------------------------------------------
+Requirement 1 – Start game & display board
+_ready()
+------------------------------------------
+"""
+
 # Main Menu
 func _ready():
 	main_menu_buttons.visible = true
