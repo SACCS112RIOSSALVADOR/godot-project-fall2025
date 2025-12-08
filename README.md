@@ -16,7 +16,7 @@ Technical Manual:
 - At any time during gameplay, you can press the Esc key to pause the game.
 
 Installation Guide:
-- Download the zipped file (also available via the GitHub repository).
+- Download the zipped file.
 - Extract the contents of the zip file to a desired location on your Windows 10/11 system.
 - Open the exe folder and run TetrisRPG.exe to start the game.
 - You can view or edit the project’s scripts and assets in the project folder using tools such as Visual Studio Code (view), Godot Engine (view or edit), or GitHub (view).
